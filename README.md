@@ -1,6 +1,6 @@
 # OAMP Web Admin Dashboard
 
-Frontend web dashboard untuk sistem **OAMP (Olympic Assessment & Measurement Platform)** — platform asesmen kognitif dan motorik anak menggunakan robotika. Dashboard ini menampilkan leaderboard, registrasi peserta via RFID, analitik per peserta, dan export laporan.
+Frontend web dashboard untuk sistem **OAMP (Otak Atik Merah Putih)** permainam platform asesmen kognitif dan motorik anak menggunakan robotika. Dashboard ini menampilkan leaderboard, registrasi peserta via RFID, analitik per peserta, dan export laporan.
 
 ## Tech Stack
 
