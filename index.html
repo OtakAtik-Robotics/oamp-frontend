@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- LAPISAN KEAMANAN 1: Content Security Policy (CSP) -->
+    <!-- Hanya mengizinkan script dari diri sendiri, CDN Bootstrap, dan koneksi ke localhost:8080 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; connect-src 'self' http://localhost:8080;">
+    
+    <title>OAMP Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="#">OAMP System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('input')">Input Data</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('ranking')">Ranking</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('monitor')">Monitor & Ekspor</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Notifikasi -->
+        <div id="alert-box" class="alert d-none" role="alert"></div>
+
+        <!-- Section 1: Input Data -->
+        <div id="section-input" class="content-section">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white"><h5 class="mb-0">Pendaftaran Peserta</h5></div>
+                <div class="card-body">
+                    <form id="form-register">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label>UID (RFID/QR) *</label>
+                                <!-- LAPISAN KEAMANAN 2: Batasan Karakter (Mencegah input terlalu panjang) -->
+                                <input type="text" id="uid" class="form-control" maxlength="50" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Nama Lengkap *</label>
+                                <!-- Pola hanya huruf dan spasi (Mencegah script HTML masuk) -->
+                                <input type="text" id="name" class="form-control" maxlength="100" pattern="[a-zA-Z\s]+" title="Hanya huruf dan spasi yang diizinkan" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Usia (3-18) *</label>
+                                <input type="number" id="age" class="form-control" min="3" max="18" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Kelas *</label>
+                                <input type="text" id="grade" class="form-control" maxlength="10" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Jenis Kelamin *</label>
+                                <select id="gender" class="form-select" required>
+                                    <option value="male">Laki-laki</option>
+                                    <option value="female">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Tinggi Badan (cm) *</label>
+                                <input type="number" step="0.1" id="height" class="form-control" min="50" max="250" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Berat Badan (kg) *</label>
+                                <input type="number" step="0.1" id="weight" class="form-control" min="10" max="150" required>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-submit" class="btn btn-primary w-100">Daftarkan Peserta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Ranking (Leaderboard) -->
+        <div id="section-ranking" class="content-section d-none">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Leaderboard Peserta</h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadLeaderboard()">Refresh</button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Nama</th>
+                                    <th>Kelas</th>
+                                    <th>Visuo-Spatial Fit</th>
+                                    <th>Waktu (s)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Monitor & Ekspor -->
+        <div id="section-monitor" class="content-section d-none">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border-0 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Status Server</h5>
+                            <p id="server-status" class="badge bg-secondary">Mengecek...</p>
+                            <br>
+                            <button class="btn btn-outline-info mt-2" onclick="checkHealth()">Cek Ulang Koneksi</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border-0 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Ekspor Laporan</h5>
+                            <p class="text-muted small">Unduh data keseluruhan</p>
+                            <a href="http://localhost:8080/api/v1/export/excel" class="btn btn-success me-2" target="_blank">Unduh Excel</a>
+                            <a href="http://localhost:8080/api/v1/export/pdf" class="btn btn-danger" target="_blank">Unduh PDF</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
