@@ -33,6 +33,23 @@ function showAlert(message, type) {
     setTimeout(() => alertBox.classList.add('d-none'), 5000);
 }
 
+// --- EVENT LISTENERS UNTUK NAVIGASI (PENGGANTI ONCLICK) ---
+document.getElementById('nav-input').addEventListener('click', function(e) {
+    e.preventDefault(); // Mencegah halaman kembali ke atas (perilaku default href="#")
+    showSection('input');
+});
+
+document.getElementById('nav-ranking').addEventListener('click', function(e) {
+    e.preventDefault();
+    showSection('ranking');
+});
+
+document.getElementById('nav-monitor').addEventListener('click', function(e) {
+    e.preventDefault();
+    showSection('monitor');
+});
+// ----------------------------------------------------------
+
 // INPUT DATA (POST /participants)
 document.getElementById('form-register').addEventListener('submit', async function(e) {
     e.preventDefault(); 
