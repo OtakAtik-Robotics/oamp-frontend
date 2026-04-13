@@ -1,6 +1,8 @@
 # OAMP Web Admin Dashboard
 
-Frontend web dashboard untuk sistem **OAMP (Otak Atik Merah Putih)** permainam platform asesmen kognitif dan motorik anak menggunakan robotika. Dashboard ini menampilkan leaderboard, registrasi peserta via RFID, analitik per peserta, dan export laporan.
+Frontend web dashboard untuk sistem **OAMP (Otak Atik Merah Putih)** — platform asesmen kognitif dan motorik anak menggunakan robotika. Dashboard ini menampilkan leaderboard CTF-style, registrasi peserta via RFID, analitik per peserta, dan export laporan.
+
+**Live Demo**: [https://projectidek.dev](https://projectidek.dev)
 
 ## Tech Stack
 
@@ -47,10 +49,11 @@ Untuk production, ganti ke URL server backend yang sesuai.
 
 | Route | Description |
 |-------|-------------|
-| `/` | **Dashboard** — Leaderboard top 10 peserta, stat cards, auto-refresh 15 detik |
-| `/register` | **Registration Station** — Form registrasi peserta baru dengan dukungan RFID scanner |
-| `/analytics/:uid` | **Participant Analytics** — Profil, riwayat sesi, chart skor, distribusi emosi |
-| `/export` | **Export** — Download laporan Excel (.xlsx) dan PDF |
+| `/` | **Dashboard** — CTF-style leaderboard dengan podium visual, line chart live score timeline, stat cards, auto-refresh 5 detik |
+| `/participants` | **All Participants** — Daftar lengkap peserta dengan search, sort, download rapor per orang |
+| `/register` | **Registration Station** — Form registrasi peserta baru dengan dukungan RFID scanner (auto-focus + Enter key detection) |
+| `/analytics/:uid` | **Participant Analytics** — Profil lengkap, ringkasan sesi, session bar chart, emotion pie chart, download rapor PDF |
+| `/export` | **Export** — Download laporan Excel (.xlsx) dan PDF leaderboard |
 
 ## API Endpoints (Backend)
 
@@ -58,35 +61,52 @@ Dashboard ini berkomunikasi dengan backend melalui endpoint berikut:
 
 | Method | Endpoint | Digunakan di |
 |--------|----------|-------------|
-| `GET` | `/health` | Health check (status banner) |
-| `GET` | `/api/v1/leaderboard` | Dashboard leaderboard |
+| `GET` | `/health` | Health check (status banner), polling setiap 30 detik |
+| `GET` | `/api/v1/leaderboard` | Dashboard leaderboard (top 10) |
+| `GET` | `/api/v1/leaderboard/timeline` | Live score timeline graph |
 | `POST` | `/api/v1/participants` | Registration form |
 | `GET` | `/api/v1/robot/auth/{uid}` | RFID UID lookup |
 | `GET` | `/api/v1/app/auth/{uid}` | Analytics — profil + semua sesi |
-| `GET` | `/api/v1/export/excel` | Download Excel |
-| `GET` | `/api/v1/export/pdf` | Download PDF |
+| `GET` | `/export/excel` | Download Excel report |
+| `GET` | `/export/pdf` | Download PDF leaderboard |
+| `GET` | `/export/rapor/{uid}` | Download rapor PDF per peserta |
+
+## Score Formula
+
+Leaderboard menggunakan formula composite score:
+
+```
+score = (level_reached × 10) + (visuo_spatial_fit × 50) + (dexterity_score × 0.2)
+```
+
+- **level_reached** (1–8): bobot tertinggi, kontribusi 10–80 poin
+- **visuo_spatial_fit** (0–1): kontribusi 0–50 poin
+- **dexterity_score** (0–100): kontribusi 0–20 poin
+
+Range: 10–150 poin. Setiap pemain punya satu entry (best session-nya).
 
 ## Project Structure
 
 ```
 src/
   lib/
-    axios.js           # Axios instance + interceptors
+    axios.js           # Axios instance + interceptors (unwrap { status, message, data })
     utils.js           # cn() utility (clsx + tailwind-merge)
   hooks/
     useHealthCheck.js  # Polling GET /health setiap 30 detik
   pages/
-    Dashboard.jsx      # / (leaderboard + stats)
-    Register.jsx       # /register (RFID-aware form)
-    Analytics.jsx      # /analytics/:uid
-    Export.jsx         # /export (blob download)
+    Dashboard.jsx      # / — leaderboard + score graph + podium
+    Participants.jsx   # /participants — semua peserta
+    Register.jsx      # /register — RFID-aware form
+    Analytics.jsx     # /analytics/:uid
+    Export.jsx         # /export
   components/
     Layout.jsx         # Navbar + header + Outlet
-    LeaderboardTable.jsx
-    ParticipantCard.jsx
-    EmotionPieChart.jsx
-    SessionBarChart.jsx
-    StatusBanner.jsx
+    LeaderboardTable.jsx # Tabel ranking + podium top 3
+    ParticipantCard.jsx  # Profil card peserta
+    EmotionPieChart.jsx  # Donut pie + emotion bars
+    SessionBarChart.jsx  # Bar chart + level line
+    StatusBanner.jsx   # Online/offline indicator
     ui/                # shadcn/ui components
 ```
 
@@ -101,6 +121,10 @@ npm run preview   # Preview production build
 
 ## Notes
 
-- **RFID Scanner**: Scanner USB berfungsi sebagai keyboard HID. Field UID di halaman Register auto-focus dan mendeteksi input scanner secara otomatis.
-- **Emotion Data**: Pie chart emosi saat ini menggunakan sample data. Endpoint backend `GET /api/v1/analytics/{participant_id}/emotions` belum tersedia.
-- **CORS**: Backend sudah dikonfigurasi `AllowAllOrigins`, tidak perlu proxy.
+- **RFID Scanner**: Scanner USB berfungsi sebagai keyboard HID. Field UID di halaman Register auto-focus dan mendeteksi input scanner secara otomatis via Enter key.
+- **Leaderboard**: CTF-style dengan podium visual untuk top 3, gradient row untuk rank 1/2/3, gap antar rank, crown/medal icons.
+- **Graph**: Line chart dengan 3 layer (area fill, glow, main line), monotone curve, custom dark tooltip, sorted by score, glow effect untuk champion line.
+- **Light/Dark Mode**: fully responsive — graph container, axis, tooltip, legend, dan card headers semua mengikuti tema sistem/browser via Tailwind `dark:` variant.
+- **Emotion Data**: Pie chart emosi menggunakan sample data. Endpoint `GET /api/v1/analytics/{participant_id}/emotions` belum tersedia di backend.
+- **Rapor**: Download PDF rapor per peserta tersedia di halaman Analytics dan di halaman Participants (tombol rapor per row).
+- **CORS**: Backend dikonfigurasi `AllowAllOrigins`, tidak perlu proxy.

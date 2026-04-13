@@ -26,6 +26,8 @@ import {
   Target,
   TrendingUp,
   FileText,
+  Trophy,
+  Flame,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -95,17 +97,26 @@ export function Analytics() {
   const { participant, sessions } = data;
   const totalSessions = sessions?.length || 0;
 
-  const bestVS =
+  // Support both `score` and `visuo_spatial_fit` fields
+  function getSessionScore(s) {
+    return s.score ?? (s.visuo_spatial_fit != null ? s.visuo_spatial_fit * 100 : null);
+  }
+
+  const bestScore =
     totalSessions > 0
-      ? Math.max(...sessions.map((s) => s.visuo_spatial_fit))
+      ? Math.max(...sessions.map(getSessionScore).filter((v) => v != null))
       : null;
   const avgTime =
     totalSessions > 0
-      ? (sessions.reduce((a, s) => a + s.total_time, 0) / totalSessions).toFixed(1)
+      ? (sessions.reduce((a, s) => a + (s.total_time || 0), 0) / totalSessions).toFixed(1)
       : null;
   const maxLevel =
     totalSessions > 0
-      ? Math.max(...sessions.map((s) => s.level_reached))
+      ? Math.max(...sessions.map((s) => s.level_reached ?? 0))
+      : null;
+  const totalScore =
+    totalSessions > 0
+      ? sessions.reduce((a, s) => a + (getSessionScore(s) || 0), 0)
       : null;
 
   return (
@@ -119,16 +130,16 @@ export function Analytics() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Participant Analytics</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Participant Analytics</h1>
             <p className="text-sm text-muted-foreground">
-              Detailed performance and health data
+              Detailed performance & health data
             </p>
           </div>
         </div>
         <Button
           onClick={handleDownloadRapor}
           disabled={downloadingRapor}
-          variant="outline"
+          className="bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 shadow-md"
         >
           {downloadingRapor ? (
             <>
@@ -147,14 +158,20 @@ export function Analytics() {
       {/* Profile card */}
       <ParticipantCard participant={participant} sessions={sessions} />
 
-      {/* Session summary mini-cards */}
+      {/* Session summary cards */}
       {totalSessions > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           <MiniStat
-            icon={<Target className="h-5 w-5" />}
-            label="Best VisuoSpatial"
-            value={bestVS ? `${(bestVS * 100).toFixed(1)}%` : "N/A"}
-            accent="blue"
+            icon={<Flame className="h-5 w-5" />}
+            label="Best Score"
+            value={bestScore != null ? Math.round(bestScore) : "N/A"}
+            accent="amber"
+          />
+          <MiniStat
+            icon={<Trophy className="h-5 w-5" />}
+            label="Total Points"
+            value={totalScore != null ? Math.round(totalScore) : "N/A"}
+            accent="yellow"
           />
           <MiniStat
             icon={<TrendingUp className="h-5 w-5" />}
@@ -166,11 +183,11 @@ export function Analytics() {
             icon={<Clock className="h-5 w-5" />}
             label="Avg Time"
             value={avgTime ? `${avgTime}s` : "N/A"}
-            accent="amber"
+            accent="blue"
           />
           <MiniStat
             icon={<Zap className="h-5 w-5" />}
-            label="Total Sessions"
+            label="Sessions"
             value={totalSessions}
             accent="purple"
           />
@@ -185,7 +202,7 @@ export function Analytics() {
             Sessions
           </TabsTrigger>
           <TabsTrigger value="emotions" className="gap-2">
-            😊 Emotion Analysis
+            Emotion Analysis
           </TabsTrigger>
         </TabsList>
 
@@ -202,7 +219,8 @@ export function Analytics() {
               {totalSessions === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Zap className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                  <p>Belum ada sesi dimainkan.</p>
+                  <p className="font-medium">Belum ada sesi dimainkan.</p>
+                  <p className="text-sm">Data sesi akan muncul setelah peserta bermain.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -213,7 +231,7 @@ export function Analytics() {
                         <TableHead>Mode</TableHead>
                         <TableHead className="text-center">Level</TableHead>
                         <TableHead className="text-center">Time</TableHead>
-                        <TableHead className="text-center">VisuoSpatial</TableHead>
+                        <TableHead className="text-center">Score</TableHead>
                         <TableHead className="text-center">Dexterity</TableHead>
                         <TableHead className="text-center">Cognitive Age</TableHead>
                         <TableHead>Date</TableHead>
@@ -221,10 +239,9 @@ export function Analytics() {
                     </TableHeader>
                     <TableBody>
                       {sessions.map((s, i) => {
-                        const isBestVS =
-                          bestVS != null && s.visuo_spatial_fit === bestVS;
-                        const isMaxLevel =
-                          maxLevel != null && s.level_reached === maxLevel;
+                        const score = getSessionScore(s);
+                        const isBest = bestScore != null && score === bestScore;
+                        const isMaxLevel = maxLevel != null && s.level_reached === maxLevel;
 
                         return (
                           <TableRow key={s.id} className="group">
@@ -233,11 +250,7 @@ export function Analytics() {
                             </TableCell>
                             <TableCell>
                               <Badge
-                                variant={
-                                  s.mode === "normal"
-                                    ? "secondary"
-                                    : "outline"
-                                }
+                                variant={s.mode === "normal" ? "secondary" : "outline"}
                                 className="capitalize"
                               >
                                 {s.mode}
@@ -248,43 +261,41 @@ export function Analytics() {
                                 className={cn(
                                   "inline-flex items-center justify-center rounded-full w-8 h-8 text-sm font-bold",
                                   isMaxLevel
-                                    ? "bg-green-100 text-green-700"
+                                    ? "bg-green-100 text-green-700 ring-2 ring-green-300"
                                     : "bg-muted text-foreground"
                                 )}
                               >
                                 {s.level_reached}
                               </span>
                             </TableCell>
-                            <TableCell className="text-center font-mono">
+                            <TableCell className="text-center font-mono text-muted-foreground">
                               {s.total_time?.toFixed(1)}s
                             </TableCell>
                             <TableCell className="text-center">
                               <span
                                 className={cn(
-                                  "font-semibold",
-                                  isBestVS
-                                    ? "text-blue-600"
-                                    : "text-foreground"
+                                  "font-bold text-base tabular-nums",
+                                  isBest ? "text-amber-600" : "text-foreground"
                                 )}
                               >
-                                {(s.visuo_spatial_fit * 100).toFixed(1)}%
+                                {score != null ? Math.round(score) : "—"}
                               </span>
+                              {isBest && (
+                                <Flame className="inline h-3.5 w-3.5 ml-1 text-amber-500" />
+                              )}
                             </TableCell>
                             <TableCell className="text-center font-mono">
-                              {s.dexterity_score?.toFixed(1)}
+                              {s.dexterity_score?.toFixed(1) ?? "—"}
                             </TableCell>
-                            <TableCell className="text-center">
-                              {s.cognitive_age}
+                            <TableCell className="text-center text-muted-foreground">
+                              {s.cognitive_age ?? "—"}
                             </TableCell>
                             <TableCell className="text-muted-foreground text-sm">
-                              {new Date(s.created_at).toLocaleDateString(
-                                "id-ID",
-                                {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )}
+                              {new Date(s.created_at).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
                             </TableCell>
                           </TableRow>
                         );
@@ -316,18 +327,14 @@ export function Analytics() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                😊 Emotion Distribution
+                Emotion Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
               <EmotionPieChart />
               <div className="mt-6 rounded-lg border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 <strong>Note:</strong> Data emosi saat ini menggunakan sample
-                data. Menunggu endpoint backend{" "}
-                <code className="bg-amber-100 px-1 rounded text-xs">
-                  GET /api/v1/analytics/&#123;id&#125;/emotions
-                </code>{" "}
-                untuk data real-time.
+                data. Menunggu endpoint backend untuk data real-time.
               </div>
             </CardContent>
           </Card>
@@ -337,23 +344,30 @@ export function Analytics() {
   );
 }
 
-const accentColors = {
-  blue: "text-blue-600 bg-blue-50",
-  green: "text-green-600 bg-green-50",
-  amber: "text-amber-600 bg-amber-50",
-  purple: "text-purple-600 bg-purple-50",
+const accentStyles = {
+  blue: "border-blue-200 bg-blue-50",
+  green: "border-green-200 bg-green-50",
+  amber: "border-amber-200 bg-amber-50",
+  yellow: "border-yellow-200 bg-yellow-50",
+  purple: "border-purple-200 bg-purple-50",
+};
+
+const accentText = {
+  blue: "text-blue-600",
+  green: "text-green-600",
+  amber: "text-amber-600",
+  yellow: "text-yellow-600",
+  purple: "text-purple-600",
 };
 
 function MiniStat({ icon, label, value, accent }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border p-4">
-      <div
-        className={`rounded-lg p-2.5 ${accentColors[accent]}`}
-      >
+    <div className={cn("flex items-center gap-3 rounded-lg border p-4", accentStyles[accent])}>
+      <div className={cn("rounded-md bg-white/70 p-2", accentText[accent])}>
         {icon}
       </div>
       <div>
-        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground font-medium">{label}</p>
         <p className="text-lg font-bold">{value}</p>
       </div>
     </div>
