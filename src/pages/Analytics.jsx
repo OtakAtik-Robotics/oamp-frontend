@@ -261,8 +261,8 @@ export function Analytics() {
                                 className={cn(
                                   "inline-flex items-center justify-center rounded-full w-8 h-8 text-sm font-bold",
                                   isMaxLevel
-                                    ? "bg-green-100 text-green-700 ring-2 ring-green-300"
-                                    : "bg-muted text-foreground"
+                                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 dark:ring-green-700 ring-2 ring-green-300"
+                                    : "bg-muted text-foreground dark:bg-slate-800 dark:text-slate-200"
                                 )}
                               >
                                 {s.level_reached}
@@ -275,7 +275,7 @@ export function Analytics() {
                               <span
                                 className={cn(
                                   "font-bold text-base tabular-nums",
-                                  isBest ? "text-amber-600" : "text-foreground"
+                                  isBest ? "text-amber-600 dark:text-amber-400" : "text-foreground dark:text-slate-100"
                                 )}
                               >
                                 {score != null ? Math.round(score) : "—"}
@@ -332,7 +332,7 @@ export function Analytics() {
             </CardHeader>
             <CardContent>
               <EmotionPieChart />
-              <div className="mt-6 rounded-lg border border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <div className="mt-6 rounded-lg border border-dashed border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
                 <strong>Note:</strong> Data emosi saat ini menggunakan sample
                 data. Menunggu endpoint backend untuk data real-time.
               </div>
@@ -345,19 +345,19 @@ export function Analytics() {
 }
 
 const accentStyles = {
-  blue: "border-blue-200 bg-blue-50",
-  green: "border-green-200 bg-green-50",
-  amber: "border-amber-200 bg-amber-50",
-  yellow: "border-yellow-200 bg-yellow-50",
-  purple: "border-purple-200 bg-purple-50",
+  blue: "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950",
+  green: "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950",
+  amber: "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950",
+  yellow: "border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950",
+  purple: "border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950",
 };
 
 const accentText = {
-  blue: "text-blue-600",
-  green: "text-green-600",
-  amber: "text-amber-600",
-  yellow: "text-yellow-600",
-  purple: "text-purple-600",
+  blue: "text-blue-600 dark:text-blue-400",
+  green: "text-green-600 dark:text-green-400",
+  amber: "text-amber-600 dark:text-amber-400",
+  yellow: "text-yellow-600 dark:text-yellow-400",
+  purple: "text-purple-600 dark:text-purple-400",
 };
 
 function MiniStat({ icon, label, value, accent }) {

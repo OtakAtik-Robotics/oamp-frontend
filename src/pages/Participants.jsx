@@ -252,7 +252,7 @@ export function Participants() {
                       </TableCell>
                       <TableCell className="text-center">
                         {p.score != null ? (
-                          <span className="inline-flex items-center gap-1 font-bold text-amber-600">
+                          <span className="inline-flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400">
                             <Flame className="h-3.5 w-3.5" />
                             {p.score}
                           </span>
@@ -262,7 +262,7 @@ export function Participants() {
                       </TableCell>
                       <TableCell className="text-center">
                         {p.level_reached != null ? (
-                          <span className="inline-flex items-center justify-center rounded-full w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold">
+                          <span className="inline-flex items-center justify-center rounded-full w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 text-sm font-bold">
                             {p.level_reached}
                           </span>
                         ) : (
@@ -341,9 +341,9 @@ export function Participants() {
 }
 
 const statColors = {
-  blue: "border-blue-200 bg-blue-50 text-blue-700",
-  amber: "border-amber-200 bg-amber-50 text-amber-700",
-  green: "border-green-200 bg-green-50 text-green-700",
+  blue: "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  amber: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  green: "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300",
 };
 
 function StatMini({ icon, label, value, color }) {

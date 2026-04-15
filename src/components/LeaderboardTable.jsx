@@ -142,7 +142,7 @@ export function LeaderboardTable({ data, loading }) {
                   {row.rank === 1 ? (
                     <Crown className="h-6 w-6 text-yellow-500 mx-auto drop-shadow-sm" />
                   ) : row.rank === 2 ? (
-                    <Medal className="h-5 w-5 text-slate-400 mx-auto" />
+                    <Medal className="h-5 w-5 text-slate-400 dark:text-slate-300 mx-auto" />
                   ) : row.rank === 3 ? (
                     <Medal className="h-5 w-5 text-orange-400 mx-auto" />
                   ) : (

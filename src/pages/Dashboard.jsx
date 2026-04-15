@@ -97,6 +97,9 @@ export function Dashboard() {
       }
       prevRank1.current = currentRank1;
     }
+    return () => {
+      if (fireTimerRef.current) clearTimeout(fireTimerRef.current);
+    };
   }, [leaderboard]);
 
   const totalParticipants = leaderboard.length;

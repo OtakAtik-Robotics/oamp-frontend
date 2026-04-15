@@ -61,7 +61,7 @@ export function Export() {
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileSpreadsheet className="h-5 w-5 text-green-600" />
+              <FileSpreadsheet className="h-5 w-5 text-green-600 dark:text-green-400" />
               Download Excel Report
             </CardTitle>
           </CardHeader>
@@ -94,7 +94,7 @@ export function Export() {
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-red-600" />
+              <FileText className="h-5 w-5 text-red-600 dark:text-red-400" />
               Download PDF Leaderboard
             </CardTitle>
           </CardHeader>
