@@ -4,8 +4,34 @@ import { Link } from "react-router-dom";
 import api from "@/lib/axios";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Gamepad2, UserPlus, Download, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  Users,
+  Gamepad2,
+  UserPlus,
+  Download,
+  Flame,
+  Settings,
+  Layers,
+  Eye,
+} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -67,17 +93,75 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export function Dashboard() {
-  const { data: boardRes, isLoading, isError } = useQuery({
-    queryKey: ["leaderboard"],
-    queryFn: () => api.get("/leaderboard"),
-    refetchInterval: 5000,
+  const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
+  const [newSessionName, setNewSessionName] = useState("");
+  const [startingSession, setStartingSession] = useState(false);
+  const [selectedBatchId, setSelectedBatchId] = useState("all");
+
+  const { data: batchesRes } = useQuery({
+    queryKey: ["batches"],
+    queryFn: () => api.get("/batches"),
   });
 
-  const { data: timeRes } = useQuery({
-    queryKey: ["timeline"],
-    queryFn: () => api.get("/leaderboard/timeline"),
-    refetchInterval: 5000,
+  const allBatches = useMemo(
+    () => batchesRes?.data?.data || batchesRes?.data || [],
+    [batchesRes]
+  );
+
+  const activeSession = useMemo(
+    () => allBatches.find((b) => b.is_active) || null,
+    [allBatches]
+  );
+
+  // Set default selected batch to active session once batches load
+  useEffect(() => {
+    if (allBatches.length > 0 && selectedBatchId === "all") {
+      const active = allBatches.find((b) => b.is_active);
+      if (active) setSelectedBatchId(String(active.id));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allBatches]);
+
+  const selectedBatch = useMemo(
+    () => allBatches.find((b) => String(b.id) === selectedBatchId) || null,
+    [allBatches, selectedBatchId]
+  );
+
+  const isReadOnly = !!(selectedBatch && !selectedBatch.is_active);
+
+  const batchParams =
+    selectedBatchId !== "all" ? { params: { batch_id: selectedBatchId } } : {};
+
+  const { data: boardRes, isLoading, isError, refetch: refetchBoard } = useQuery({
+    queryKey: ["leaderboard", selectedBatchId],
+    queryFn: () => api.get("/leaderboard", batchParams),
+    refetchInterval: isReadOnly ? false : 5000,
   });
+
+  const { data: timeRes, refetch: refetchTimeline } = useQuery({
+    queryKey: ["timeline", selectedBatchId],
+    queryFn: () => api.get("/leaderboard/timeline", batchParams),
+    refetchInterval: isReadOnly ? false : 5000,
+  });
+
+  async function handleStartNewSession() {
+    if (!newSessionName.trim()) {
+      toast.error("Nama sesi tidak boleh kosong.");
+      return;
+    }
+    setStartingSession(true);
+    try {
+      await api.post("/batches", { name: newSessionName.trim() });
+      toast.success(`Sesi "${newSessionName.trim()}" berhasil dimulai!`);
+      setNewSessionName("");
+      setSessionDialogOpen(false);
+      await Promise.all([refetchBoard(), refetchTimeline()]);
+    } catch {
+      toast.error("Gagal memulai sesi baru. Server tidak tersedia.");
+    } finally {
+      setStartingSession(false);
+    }
+  }
 
   const leaderboard = useMemo(() => boardRes?.data?.data || boardRes?.data || [], [boardRes]);
   const rawTimeline = useMemo(() => timeRes?.data?.data || timeRes?.data || [], [timeRes]);
@@ -91,7 +175,6 @@ export function Dashboard() {
       const currentRank1 = leaderboard[0].name;
       if (prevRank1.current && prevRank1.current !== currentRank1) {
         if (fireTimerRef.current) clearTimeout(fireTimerRef.current);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFireEvent(currentRank1);
         fireTimerRef.current = setTimeout(() => setFireEvent(null), 4000);
       }
@@ -109,7 +192,10 @@ export function Dashboard() {
       ? (leaderboard.reduce((a, b) => a + b.score, 0) / leaderboard.length).toFixed(0)
       : "N/A";
 
-  const topPlayers = leaderboard.slice(0, 8).map((p) => p.name);
+  const topPlayers = useMemo(
+    () => leaderboard.slice(0, 8).map((p) => p.name),
+    [leaderboard]
+  );
 
   const { processedTimeline, playerLatestScores } = useMemo(() => {
     const timeline = [];
@@ -164,8 +250,52 @@ export function Dashboard() {
       )}
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold tracking-tight">OAMP Leaderboard</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight">OAMP Leaderboard</h1>
+          {activeSession && (
+            <Badge
+              variant="outline"
+              className="bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-950 dark:border-orange-800 dark:text-orange-300 gap-1.5 text-xs px-2.5 py-1"
+            >
+              <Layers className="h-3 w-3" />
+              {activeSession.name}
+            </Badge>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Select value={selectedBatchId} onValueChange={setSelectedBatchId}>
+            <SelectTrigger className="w-[200px] h-9">
+              <SelectValue placeholder="Pilih sesi..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Sesi</SelectItem>
+              {allBatches.map((batch) => (
+                <SelectItem key={batch.id} value={String(batch.id)}>
+                  <span className="flex items-center gap-2">
+                    {batch.is_active ? (
+                      <Layers className="h-3 w-3 text-orange-500" />
+                    ) : (
+                      <Eye className="h-3 w-3 text-slate-400" />
+                    )}
+                    {batch.name}
+                    {!batch.is_active && (
+                      <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0.5">
+                        Archived
+                      </Badge>
+                    )}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSessionDialogOpen(true)}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Manajemen Sesi
+          </Button>
           <Button asChild variant="outline" size="sm">
             <Link to="/register">
               <UserPlus className="h-4 w-4 mr-2" />
@@ -180,6 +310,16 @@ export function Dashboard() {
           </Button>
         </div>
       </div>
+
+      {isReadOnly && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-md text-sm font-medium dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800 flex items-center gap-2">
+          <Eye className="h-4 w-4" />
+          <span>
+            Anda sedang melihat data sesi lama —{" "}
+            <strong>{selectedBatch?.name}</strong>. Leaderboard tidak akan auto-refresh.
+          </span>
+        </div>
+      )}
 
       {isError && (
         <div className="bg-red-100 text-red-800 px-4 py-3 rounded-md text-sm font-medium dark:bg-red-900/30 dark:text-red-400">
@@ -366,6 +506,62 @@ export function Dashboard() {
           <LeaderboardTable data={leaderboard} loading={isLoading} />
         </CardContent>
       </Card>
+
+      <Dialog open={sessionDialogOpen} onOpenChange={setSessionDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Manajemen Sesi
+            </DialogTitle>
+            <DialogDescription>
+              Buat sesi baru untuk me-reset leaderboard dan memulai kompetisi
+              fresh.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">
+                Nama Sesi Baru
+              </label>
+              <Input
+                placeholder="Contoh: Sesi 1 - Putaran Pertama"
+                value={newSessionName}
+                onChange={(e) => setNewSessionName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleStartNewSession();
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                onClick={handleStartNewSession}
+                disabled={startingSession}
+                className="w-full"
+              >
+                {startingSession ? (
+                  <>
+                    <Flame className="h-4 w-4 mr-2 animate-spin" />
+                    Memulai...
+                  </>
+                ) : (
+                  <>
+                    <Layers className="h-4 w-4 mr-2" />
+                    Mulai Sesi Baru
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setSessionDialogOpen(false)}
+                className="w-full"
+              >
+                Batal
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

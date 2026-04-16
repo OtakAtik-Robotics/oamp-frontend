@@ -42,7 +42,7 @@ export function SessionBarChart({ sessions }) {
   }
 
   const chartData = sessions.map((s, i) => {
-    const score = s.score ?? (s.visuo_spatial_fit != null ? Math.round(s.visuo_spatial_fit * 1000) / 10 : 0);
+    const score = s.score ?? (s.visuo_spatial_fit != null ? Math.round(s.visuo_spatial_fit * 100) : 0);
     return {
       session: `#${i + 1}`,
       score,

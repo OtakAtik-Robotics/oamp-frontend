@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import api from "@/lib/axios";
 import { ParticipantCard } from "@/components/ParticipantCard";
 import { EmotionPieChart } from "@/components/EmotionPieChart";
@@ -28,6 +29,8 @@ import {
   FileText,
   Trophy,
   Flame,
+  Sparkles,
+  WifiOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -35,6 +38,9 @@ import { toast } from "sonner";
 export function Analytics() {
   const { uid } = useParams();
   const [downloadingRapor, setDownloadingRapor] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(false);
 
   async function handleDownloadRapor() {
     setDownloadingRapor(true);
@@ -55,6 +61,31 @@ export function Analytics() {
       toast.error("Gagal mengunduh rapor. Server tidak tersedia.");
     } finally {
       setDownloadingRapor(false);
+    }
+  }
+
+  async function handleGenerateAI() {
+    setAiLoading(true);
+    setAiError(false);
+    setAiAnalysis(null);
+
+    try {
+      const res = await api.get(`/participants/analysis/${uid}`, { timeout: 60000 });
+
+      if (res.status === "success") {
+        setAiAnalysis(res.data?.analysis || "");
+        toast.success("✨ Analisis AI berhasil dibuat!");
+      } else if (res.status === "fallback") {
+        setAiAnalysis(res.data?.analysis || "");
+        toast.warning("⚠️ AI sedang sibuk. Menampilkan pesan fallback.");
+      } else {
+        throw new Error("Invalid response status");
+      }
+    } catch {
+      setAiError(true);
+      toast.error("❌ Gagal terhubung ke server.");
+    } finally {
+      setAiLoading(false);
     }
   }
 
@@ -99,7 +130,7 @@ export function Analytics() {
 
   // Support both `score` and `visuo_spatial_fit` fields
   function getSessionScore(s) {
-    return s.score ?? (s.visuo_spatial_fit != null ? s.visuo_spatial_fit * 100 : null);
+    return s.score ?? (s.visuo_spatial_fit != null ? Math.round(s.visuo_spatial_fit * 100) : null);
   }
 
   const bestScore =
@@ -193,6 +224,95 @@ export function Analytics() {
           />
         </div>
       )}
+
+      {/* AI Health Consultant Card */}
+      <Card className="border-purple-200 dark:border-purple-800 overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500" />
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-500" />
+              AI Health Consultant
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!aiAnalysis && !aiLoading && !aiError && (
+            <div className="flex flex-col items-center justify-center py-8 gap-4">
+              <div className="rounded-full bg-purple-100 dark:bg-purple-900 p-4">
+                <Sparkles className="h-8 w-8 text-purple-500" />
+              </div>
+              <div className="text-center">
+                <p className="font-medium text-foreground">
+                  Dapatkan analisis kesehatan bertenaga AI
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  AI akan menganalisis data performa dan emosi peserta untuk
+                  memberikan rekomendasi kesehatan kognitif.
+                </p>
+              </div>
+              <Button
+                onClick={handleGenerateAI}
+                className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white shadow-md"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate AI Health Analysis
+              </Button>
+            </div>
+          )}
+
+          {aiLoading && (
+            <div className="flex flex-col items-center justify-center py-8 gap-4">
+              <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+              <p className="text-sm text-muted-foreground">
+                AI sedang menganalisis data peserta...
+              </p>
+              <div className="w-full max-w-md space-y-2">
+                <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+                <div className="h-3 w-5/6 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+                <div className="h-3 w-4/6 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+              </div>
+            </div>
+          )}
+
+          {aiError && (
+            <div className="flex flex-col items-center justify-center py-6 gap-3">
+              <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-4">
+                <WifiOff className="h-8 w-8 text-slate-400" />
+              </div>
+              <div className="text-center">
+                <p className="font-medium text-foreground">
+                  AI Consultant sedang offline
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Koneksi ke server AI terputus, namun data profil dan skor Anda
+                  tetap aman.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleGenerateAI}
+                className="mt-2"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Coba Lagi
+              </Button>
+            </div>
+          )}
+
+          {aiAnalysis && !aiLoading && !aiError && (
+            <div className="space-y-4">
+              <div className="rounded-lg bg-purple-50 dark:bg-purple-950/50 p-4 text-sm leading-relaxed">
+                <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+              </div>
+              <div className="rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                ⚠️ Hasil ini di-generate oleh AI untuk tujuan edukasi dan
+                skrining awal, bukan sebagai diagnosis medis pengganti dokter.
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Tabs */}
       <Tabs defaultValue="sessions">

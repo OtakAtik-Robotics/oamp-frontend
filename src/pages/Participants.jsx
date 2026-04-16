@@ -76,7 +76,7 @@ export function Participants() {
         p.grade.toLowerCase().includes(q)
     );
 
-    result.sort((a, b) => {
+    const sorted = [...result].sort((a, b) => {
       let valA = a[sortField];
       let valB = b[sortField];
       if (typeof valA === "string") valA = valA.toLowerCase();
@@ -88,7 +88,7 @@ export function Participants() {
       return 0;
     });
 
-    return result;
+    return sorted;
   }, [participants, search, sortField, sortDir]);
 
   function toggleSort(field) {
