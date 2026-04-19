@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import api from "@/lib/axios";
 import { ParticipantCard } from "@/components/ParticipantCard";
@@ -31,7 +31,17 @@ import {
   Flame,
   Sparkles,
   WifiOff,
+  Lock,
+  CreditCard,
+  CheckCircle,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -41,6 +51,23 @@ export function Analytics() {
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(false);
+  const [aiPaymentRequired, setAiPaymentRequired] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const snapScriptInjected = useRef(false);
+
+  // Inject Midtrans Snap script once
+  useEffect(() => {
+    if (snapScriptInjected.current) return;
+    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+    if (!clientKey) return;
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute("data-client-key", clientKey);
+    script.async = true;
+    document.body.appendChild(script);
+    snapScriptInjected.current = true;
+  }, []);
 
   async function handleDownloadRapor() {
     setDownloadingRapor(true);
@@ -68,16 +95,22 @@ export function Analytics() {
     setAiLoading(true);
     setAiError(false);
     setAiAnalysis(null);
+    setAiPaymentRequired(false);
 
     try {
       const res = await api.get(`/participants/analysis/${uid}`, { timeout: 60000 });
 
       if (res.status === "success") {
         setAiAnalysis(res.data?.analysis || "");
+        setAiPaymentRequired(false);
         toast.success("✨ Analisis AI berhasil dibuat!");
       } else if (res.status === "fallback") {
         setAiAnalysis(res.data?.analysis || "");
+        setAiPaymentRequired(false);
         toast.warning("⚠️ AI sedang sibuk. Menampilkan pesan fallback.");
+      } else if (res.status === "payment_required") {
+        setAiPaymentRequired(true);
+        toast.info("🔒 Hasil analisis terkunci. Selesaikan pembayaran untuk membuka.");
       } else {
         throw new Error("Invalid response status");
       }
@@ -86,6 +119,79 @@ export function Analytics() {
       toast.error("❌ Gagal terhubung ke server.");
     } finally {
       setAiLoading(false);
+    }
+  }
+
+  async function handlePaymentSuccess() {
+    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+    setProcessingPayment(true);
+    setPaymentModalOpen(false);
+
+    try {
+      // Step 1: Checkout → get snap_token
+      const checkoutRes = await api.post(`/payment/checkout/${uid}`);
+      if (checkoutRes.status !== "success") {
+        throw new Error("Checkout failed");
+      }
+      const snapToken = checkoutRes.data?.snap_token;
+      if (!snapToken) {
+        throw new Error("No snap_token returned");
+      }
+
+      // Step 2: Open Midtrans Snap popup
+      if (clientKey && window.snap) {
+        window.snap.pay(snapToken, {
+          onSuccess(_result) {
+            toast.success("✅ Pembayaran berhasil! Mengambil hasil analisis...");
+            setAiPaymentRequired(false);
+            setAiLoading(true);
+            setAiError(false);
+            api.get(`/participants/analysis/${uid}`, { timeout: 60000 })
+              .then((res) => {
+                if (res.status === "success") {
+                  setAiAnalysis(res.data?.analysis || "");
+                  toast.success("✨ Analisis AI berhasil dibuka!");
+                } else if (res.status === "fallback") {
+                  setAiAnalysis(res.data?.analysis || "");
+                } else {
+                  throw new Error("Invalid response status");
+                }
+              })
+              .catch(() => {
+                setAiError(true);
+                toast.error("❌ Gagal mengambil hasil analisis.");
+              })
+              .finally(() => setAiLoading(false));
+          },
+          onPending(_result) {
+            toast.info("⏳ Pembayaran pending. Selesaikan pembayaran untuk membuka hasil.");
+          },
+          onError(_result) {
+            toast.error("❌ Pembayaran gagal. Silakan coba lagi.");
+          },
+        });
+      } else {
+        // Fallback: simulate success if Midtrans not configured
+        const transactionId = checkoutRes.data?.transaction_id;
+        await api.post(`/payment/simulate-success/${uid}`, { transaction_id: transactionId });
+        toast.success("✅ Pembayaran berhasil! Mengambil hasil analisis...");
+        setAiPaymentRequired(false);
+        setAiLoading(true);
+        setAiError(false);
+        const res = await api.get(`/participants/analysis/${uid}`, { timeout: 60000 });
+        if (res.status === "success") {
+          setAiAnalysis(res.data?.analysis || "");
+          toast.success("✨ Analisis AI berhasil dibuka!");
+        } else if (res.status === "fallback") {
+          setAiAnalysis(res.data?.analysis || "");
+        } else {
+          throw new Error("Invalid response status");
+        }
+      }
+    } catch {
+      toast.error("❌ Pembayaran gagal. Coba lagi.");
+    } finally {
+      setProcessingPayment(false);
     }
   }
 
@@ -150,6 +256,8 @@ export function Analytics() {
       ? sessions.reduce((a, s) => a + (getSessionScore(s) || 0), 0)
       : null;
 
+  const isPremium = participant?.is_premium || false;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -186,36 +294,54 @@ export function Analytics() {
         </Button>
       </div>
 
+      {/* Premium gate banner */}
+      {!isPremium && (
+        <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-md text-sm flex items-center justify-between gap-3">
+          <span className="flex items-center gap-2"><Lock className="h-4 w-4" />Data peserta terkunci. Bayar untuk membuka akses penuh.</span>
+          <Button size="sm" asChild>
+            <Link to={`/paywall/${uid}`}><CreditCard className="h-3.5 w-3.5 mr-1" />Bayar Rp 10.000</Link>
+          </Button>
+        </div>
+      )}
+
       {/* Profile card */}
       <ParticipantCard participant={participant} sessions={sessions} />
 
       {/* Session summary cards */}
       {totalSessions > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <MiniStat
-            icon={<Flame className="h-5 w-5" />}
-            label="Best Score"
-            value={bestScore != null ? Math.round(bestScore) : "N/A"}
-            accent="amber"
-          />
-          <MiniStat
-            icon={<Trophy className="h-5 w-5" />}
-            label="Total Points"
-            value={totalScore != null ? Math.round(totalScore) : "N/A"}
-            accent="yellow"
-          />
-          <MiniStat
-            icon={<TrendingUp className="h-5 w-5" />}
-            label="Max Level"
-            value={maxLevel ?? "N/A"}
-            accent="green"
-          />
-          <MiniStat
-            icon={<Clock className="h-5 w-5" />}
-            label="Avg Time"
-            value={avgTime ? `${avgTime}s` : "N/A"}
-            accent="blue"
-          />
+          <PremiumLock locked={!isPremium}>
+            <MiniStat
+              icon={<Flame className="h-5 w-5" />}
+              label="Best Score"
+              value={bestScore != null ? Math.round(bestScore) : "N/A"}
+              accent="amber"
+            />
+          </PremiumLock>
+          <PremiumLock locked={!isPremium}>
+            <MiniStat
+              icon={<Trophy className="h-5 w-5" />}
+              label="Total Points"
+              value={totalScore != null ? Math.round(totalScore) : "N/A"}
+              accent="yellow"
+            />
+          </PremiumLock>
+          <PremiumLock locked={!isPremium}>
+            <MiniStat
+              icon={<TrendingUp className="h-5 w-5" />}
+              label="Max Level"
+              value={maxLevel ?? "N/A"}
+              accent="green"
+            />
+          </PremiumLock>
+          <PremiumLock locked={!isPremium}>
+            <MiniStat
+              icon={<Clock className="h-5 w-5" />}
+              label="Avg Time"
+              value={avgTime ? `${avgTime}s` : "N/A"}
+              accent="blue"
+            />
+          </PremiumLock>
           <MiniStat
             icon={<Zap className="h-5 w-5" />}
             label="Sessions"
@@ -271,6 +397,43 @@ export function Analytics() {
                 <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
                 <div className="h-3 w-5/6 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
                 <div className="h-3 w-4/6 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+              </div>
+            </div>
+          )}
+
+          {aiPaymentRequired && !aiLoading && (
+            <div className="relative flex flex-col items-center justify-center py-10 gap-4">
+              {/* Blurred dummy content */}
+              <div className="absolute inset-0 flex flex-col gap-3 px-6 opacity-30 pointer-events-none select-none blur-[2px]">
+                <div className="h-4 w-full bg-slate-300 dark:bg-slate-700 rounded" />
+                <div className="h-4 w-5/6 bg-slate-300 dark:bg-slate-700 rounded" />
+                <div className="h-4 w-4/6 bg-slate-300 dark:bg-slate-700 rounded" />
+                <div className="h-4 w-full bg-slate-300 dark:bg-slate-700 rounded" />
+                <div className="h-4 w-3/4 bg-slate-300 dark:bg-slate-700 rounded" />
+              </div>
+              {/* Lock overlay */}
+              <div className="relative flex flex-col items-center gap-4 text-center">
+                <div className="rounded-full bg-amber-100 dark:bg-amber-900/40 p-5">
+                  <Lock className="h-10 w-10 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground text-lg">
+                    🔒 Analisis Premium
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+                    Hasil lengkap AI Health Consultant hanya tersedia untuk pengguna premium.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setPaymentModalOpen(true)}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg font-semibold px-6"
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Buka Rapor AI Premium — Rp 50.000
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Pembayaran aman via QRIS • Proses instant
+                </p>
               </div>
             </div>
           )}
@@ -451,15 +614,92 @@ export function Analytics() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <EmotionPieChart />
-              <div className="mt-6 rounded-lg border border-dashed border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
-                <strong>Note:</strong> Data emosi saat ini menggunakan sample
-                data. Menunggu endpoint backend untuk data real-time.
-              </div>
+              <PremiumLock locked={!isPremium}>
+                <EmotionPieChart />
+              </PremiumLock>
+              {!isPremium && (
+                <div className="mt-4 rounded-lg border border-dashed border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950 px-4 py-3 text-sm text-amber-800 dark:text-amber-200 text-center">
+                  <Lock className="h-4 w-4 inline mr-1 mb-0.5" />
+                  Data emosi hanya tersedia untuk pengguna premium.
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Mock Payment Modal */}
+      <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-amber-600" />
+              Pembayaran OAMP Premium
+            </DialogTitle>
+            <DialogDescription>
+              Scan QRIS berikut untuk menyelesaikan pembayaran sebesar{" "}
+              <strong>Rp 50.000</strong>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col items-center gap-4 py-4">
+            {/* QRIS Dummy */}
+            <div className="w-48 h-48 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+              <div className="text-center">
+                <div className="text-4xl mb-2">📱</div>
+                <p className="text-xs text-muted-foreground font-medium">QRIS DUMMY</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Gopay • OVO • Dana • Shopeepay</p>
+              </div>
+            </div>
+
+            <div className="w-full text-center space-y-1">
+              <p className="text-sm font-semibold text-foreground">Total: Rp 50.000</p>
+              <p className="text-xs text-muted-foreground">
+                Pembayaran aman &amp; instant via QRIS
+              </p>
+            </div>
+
+            <div className="w-full border-t border-slate-200 dark:border-slate-700 pt-4 space-y-2">
+              <Button
+                onClick={handlePaymentSuccess}
+                disabled={processingPayment}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold"
+              >
+                {processingPayment ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Konfirmasi Pembayaran
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setPaymentModalOpen(false)}
+                disabled={processingPayment}
+                className="w-full"
+              >
+                Batal
+              </Button>
+            </div>
+
+            {/* Test simulation button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePaymentSuccess}
+              disabled={processingPayment}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              ⚙️ [TEST] Simulasikan Bayar Sukses
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -489,6 +729,22 @@ function MiniStat({ icon, label, value, accent }) {
       <div>
         <p className="text-xs text-muted-foreground font-medium">{label}</p>
         <p className="text-lg font-bold">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function PremiumLock({ children, locked }) {
+  if (!locked) return children;
+  return (
+    <div className="relative">
+      <div className="opacity-20 pointer-events-none select-none blur-[2px]">
+        {children}
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-3 shadow-sm">
+          <Lock className="h-5 w-5 text-slate-400" />
+        </div>
       </div>
     </div>
   );

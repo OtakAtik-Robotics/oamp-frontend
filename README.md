@@ -16,7 +16,8 @@ Frontend dashboard untuk sistem **OAMP (Otak Atik Merah Putih)** — platform as
 | Routing | React Router v7 |
 | Data Fetching | TanStack React Query |
 | Icons | Lucide React |
-| Toast Notifications | Sonner |
+| Toast | Sonner |
+| Payment | Midtrans Snap (sandbox) |
 
 ## Prerequisites
 
@@ -41,21 +42,40 @@ Buka `http://localhost:5173` di browser.
 ## Environment Variables
 
 ```env
-VITE_API_URL=http://localhost:8080/api/v1    # Development
-VITE_API_URL=https://your-server/api/v1       # Production
+VITE_API_URL=http://localhost:8080/api/v1                # Backend API
+VITE_MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxx          # Midtrans Snap sandbox
 ```
 
 ## Pages & Routes
 
 | Route | Description |
 |-------|-------------|
-| `/` | **Dashboard** — CTF-style leaderboard dengan podium visual, line chart live score timeline, stat cards, session selector, auto-refresh 5 detik |
-| `/participants` | **All Participants** — Daftar lengkap peserta dengan search, sort, download rapor per orang |
-| `/register` | **Registration Station** — Form registrasi peserta baru dengan dukungan RFID scanner (auto-focus + Enter key detection) |
-| `/analytics/:uid` | **Participant Analytics** — Profil lengkap, ringkasan sesi, session bar chart, emotion pie chart, AI health consultant, download rapor PDF |
-| `/export` | **Export** — Download laporan Excel (.xlsx) dan PDF leaderboard |
+| `/` | **Dashboard** — CTF-style leaderboard, podium, live timeline graph, session selector |
+| `/participants` | **All Participants** — Daftar peserta, search, sort, download rapor |
+| `/register` | **Registration** — Form registrasi + RFID scanner → redirect ke Paywall |
+| `/paywall/:uid` | **Paywall** — Bayar sebelum main, Midtrans Snap popup |
+| `/analytics/:uid` | **Participant Analytics** — Profil, sesi, chart, AI analysis (premium gate) |
+| `/export` | **Export** — Download Excel + PDF |
+
+## User Flow
+
+```
+Register → /paywall/:uid → Bayar (Midtrans/test) → ✅ LUNAS → Dashboard / Analytics
+```
+
+Non-premium → data di-blur (vital signs, emotions, AI analysis). Premium → full access.
+
+## Demographics
+
+Grades: `TK`, `SD`, `SMP`, `SMA`, `Mahasiswa`, `Umum`
 
 ## Fitur Utama
+
+### Paywall (Freemium)
+- **Pay upfront**: Bayar sebelum main → `POST /payment/checkout/{uid}` → `snap_token` → `window.snap.pay()`
+- **Fallback**: Jika `VITE_MIDTRANS_CLIENT_KEY` tidak diset → `POST /payment/simulate-success/{uid}`
+- **Premium gate**: `participant.is_premium` → false = blur semua data (vital signs, emotion chart, AI analysis)
+- **Price**: Rp 10.000
 
 ### Session Management
 - **Manajemen Sesi**: Buat sesi baru untuk me-reset leaderboard dan memulai kompetisi fresh via tombol "Manajemen Sesi" di Dashboard
@@ -87,7 +107,9 @@ VITE_API_URL=https://your-server/api/v1       # Production
 | `POST` | `/api/v1/participants` | Registration form |
 | `GET` | `/api/v1/robot/auth/{uid}` | RFID UID lookup |
 | `GET` | `/api/v1/app/auth/{uid}` | Analytics — profil + semua sesi |
-| `GET` | `/api/v1/participants/analysis/{uid}` | AI Health Consultant |
+| `GET` | `/api/v1/participants/analysis/{uid}` | AI Health Consultant (payment-gated) |
+| `POST` | `/api/v1/payment/checkout/{uid}` | Midtrans checkout → snap_token |
+| `POST` | `/api/v1/payment/simulate-success/{uid}` | Test payment → set is_premium=true |
 | `GET` | `/api/v1/batches` | Session selector (Dashboard) |
 | `POST` | `/api/v1/batches` | Membuat sesi baru |
 | `GET` | `/export/excel` | Download Excel report |
@@ -120,8 +142,9 @@ src/
   pages/
     Dashboard.jsx      # / — leaderboard + score graph + session management
     Participants.jsx   # /participants — semua peserta
-    Register.jsx        # /register — RFID-aware form
-    Analytics.jsx      # /analytics/:uid — analytics + AI consultant
+    Register.jsx        # /register — RFID-aware form → paywall redirect
+    Paywall.jsx         # /paywall/:uid — Midtrans payment gate
+    Analytics.jsx      # /analytics/:uid — analytics + AI consultant (premium blur)
     Export.jsx         # /export — download Excel/PDF
   components/
     Layout.jsx          # Navbar + header + Outlet

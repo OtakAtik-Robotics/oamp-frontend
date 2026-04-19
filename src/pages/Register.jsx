@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,13 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { UserPlus, CheckCircle, Loader2 } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 
-const GRADES = [
-  "1A","1B","2A","2B","3A","3B","4A","4B","5A","5B","6A","6B",
-];
+const GRADES = ["TK", "SD", "SMP", "SMA", "Mahasiswa", "Umum"];
 
 const initialForm = {
   uid: "",
@@ -34,25 +32,14 @@ const initialForm = {
 };
 
 export function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [registered, setRegistered] = useState(null);
   const uidRef = useRef(null);
 
   useEffect(() => {
     uidRef.current?.focus();
   }, []);
-
-  useEffect(() => {
-    if (registered) {
-      const timer = setTimeout(() => {
-        setRegistered(null);
-        setForm(initialForm);
-        setTimeout(() => uidRef.current?.focus(), 50);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [registered]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -100,7 +87,8 @@ export function Register() {
     try {
       const res = await api.post("/participants", payload);
       toast.success("Peserta berhasil didaftarkan!");
-      setRegistered(res.data);
+      const newUid = res.data?.uid || payload.uid;
+      navigate(`/paywall/${newUid}`);
     } catch (err) {
       const msg =
         err.response?.data?.message || "Gagal mendaftarkan peserta.";
@@ -116,36 +104,6 @@ export function Register() {
     } finally {
       setLoading(false);
     }
-  }
-
-  if (registered) {
-    return (
-      <div className="max-w-md mx-auto mt-16">
-        <Card className="border-green-300 bg-green-50">
-          <CardContent className="flex flex-col items-center gap-4 p-8">
-            <CheckCircle className="h-16 w-16 text-green-600" />
-            <h2 className="text-xl font-bold text-green-800">
-              Registrasi Berhasil!
-            </h2>
-            <div className="text-center space-y-1">
-              <p className="text-lg font-semibold">{registered.name}</p>
-              <p className="text-sm text-muted-foreground">
-                UID: {registered.uid}
-              </p>
-              <Badge>{registered.grade}</Badge>
-            </div>
-            <div className="bg-white rounded-lg p-4 w-full mt-2 border">
-              <p className="text-xs text-muted-foreground text-center">
-                QR Code Placeholder
-              </p>
-              <div className="w-32 h-32 mx-auto mt-2 bg-muted rounded flex items-center justify-center text-muted-foreground text-sm">
-                QR
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
   }
 
   return (

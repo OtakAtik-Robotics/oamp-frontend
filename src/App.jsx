@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { Register } from "@/pages/Register";
+import { Paywall } from "@/pages/Paywall";
 import { Analytics } from "@/pages/Analytics";
 import { Export } from "@/pages/Export";
 import { Participants } from "@/pages/Participants";
@@ -26,6 +27,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/participants" element={<Participants />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/paywall/:uid" element={<Paywall />} />
             <Route path="/analytics/:uid" element={<Analytics />} />
             <Route path="/export" element={<Export />} />
           </Route>
