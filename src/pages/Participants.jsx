@@ -14,6 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Users,
   Search,
   FileText,
@@ -23,6 +30,7 @@ import {
   Trophy,
   Gamepad2,
   Eye,
+  Filter,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -34,15 +42,28 @@ export function Participants() {
   const [sortField, setSortField] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
   const [downloadingRapor, setDownloadingRapor] = useState({});
+  const [selectedBatch, setSelectedBatch] = useState("all");
+
+  const { data: batchesRes } = useQuery({
+    queryKey: ["batches"],
+    queryFn: () => api.get("/batches"),
+  });
+
+  const allBatches = useMemo(
+    () => batchesRes?.data || [],
+    [batchesRes]
+  );
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["participants"],
+    queryKey: ["participants", selectedBatch],
+    staleTime: 0,
     queryFn: async () => {
+      const params = selectedBatch !== "all" ? { params: { batch_id: selectedBatch } } : {};
       try {
-        const res = await api.get("/participants");
+        const res = await api.get("/participants", params);
         return res.data;
       } catch {
-        const res = await api.get("/leaderboard");
+        const res = await api.get("/leaderboard", params);
         return res.data;
       }
     },
@@ -170,15 +191,32 @@ export function Participants() {
         />
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Cari nama, UID, atau kelas..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Cari nama, UID, atau kelas..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+          <SelectTrigger className="w-[200px]">
+            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+            <SelectValue placeholder="Semua Sesi" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Sesi</SelectItem>
+            {allBatches.map((b) => (
+              <SelectItem key={b.id} value={String(b.id)}>
+                {b.name}
+                {!b.is_active && " (arsip)"}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <Card>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const initialForm = {
 
 export function Register() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const uidRef = useRef(null);
@@ -88,8 +90,11 @@ export function Register() {
       const res = await api.post("/participants", payload);
       toast.success("Peserta berhasil didaftarkan!");
       const newUid = res.data?.uid || payload.uid;
+      await queryClient.invalidateQueries({ queryKey: ["participants"] });
+      await queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
       navigate(`/paywall/${newUid}`);
     } catch (err) {
+      console.error("[Register] Failed:", err?.response?.status, err?.response?.data);
       const msg =
         err.response?.data?.message || "Gagal mendaftarkan peserta.";
       if (

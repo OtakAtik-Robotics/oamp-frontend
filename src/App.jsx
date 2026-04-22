@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { Register } from "@/pages/Register";
@@ -20,21 +21,23 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/participants" element={<Participants />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/paywall/:uid" element={<Paywall />} />
-            <Route path="/analytics/:uid" element={<Analytics />} />
-            <Route path="/export" element={<Export />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-      <Toaster richColors position="top-right" />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/participants" element={<Participants />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/paywall/:uid" element={<Paywall />} />
+              <Route path="/analytics/:uid" element={<Analytics />} />
+              <Route path="/export" element={<Export />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+        <Toaster richColors position="top-right" />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
