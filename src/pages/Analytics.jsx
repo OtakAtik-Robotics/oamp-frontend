@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import api from "@/lib/axios";
 import { ParticipantCard } from "@/components/ParticipantCard";
 import { EmotionPieChart } from "@/components/EmotionPieChart";
@@ -465,8 +466,10 @@ export function Analytics() {
 
           {aiAnalysis && !aiLoading && !aiError && (
             <div className="space-y-4">
-              <div className="rounded-lg bg-purple-50 dark:bg-purple-950/50 p-4 text-sm leading-relaxed">
-                <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+              <div className="rounded-lg bg-purple-50 dark:bg-purple-950/50 p-6 prose prose-sm prose-slate dark:prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {aiAnalysis}
+                </ReactMarkdown>
               </div>
               <div className="rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
                 ⚠️ Hasil ini di-generate oleh AI untuk tujuan edukasi dan
