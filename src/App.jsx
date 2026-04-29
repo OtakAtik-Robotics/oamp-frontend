@@ -7,6 +7,7 @@ import { Register } from "@/pages/Register";
 import { Analytics } from "@/pages/Analytics";
 import { Export } from "@/pages/Export";
 import { Participants } from "@/pages/Participants";
+import { Competitif } from "@/pages/Competitif";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,6 +20,7 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
+<<<<<<< Updated upstream
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
@@ -33,6 +35,26 @@ function App() {
       </BrowserRouter>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
+=======
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/participants" element={<Participants />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/paywall/:uid" element={<Paywall />} />
+              <Route path="/analytics/:uid" element={<Analytics />} />
+              <Route path="/export" element={<Export />} />
+              <Route path="/competitif" element={<Competitif />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+        <Toaster richColors position="top-right" />
+      </QueryClientProvider>
+    </ErrorBoundary>
+>>>>>>> Stashed changes
   );
 }
 
