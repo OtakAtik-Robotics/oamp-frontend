@@ -9,6 +9,8 @@ import { Paywall } from "@/pages/Paywall";
 import { Analytics } from "@/pages/Analytics";
 import { Export } from "@/pages/Export";
 import { Participants } from "@/pages/Participants";
+import { Competitif } from "@/pages/Competitif";
+import { MatchDashboard } from "@/pages/MatchDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,7 +34,9 @@ function App() {
               <Route path="/paywall/:uid" element={<Paywall />} />
               <Route path="/analytics/:uid" element={<Analytics />} />
               <Route path="/export" element={<Export />} />
+              <Route path="/competitif" element={<Competitif />} />
             </Route>
+            <Route path="/match/:room_id" element={<MatchDashboard />} />
           </Routes>
         </BrowserRouter>
         <Toaster richColors position="top-right" />

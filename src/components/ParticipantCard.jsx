@@ -34,15 +34,15 @@ export function ParticipantCard({ participant }) {
               <div className="flex items-center gap-3 mt-1.5 text-blue-200 text-sm">
                 <span className="flex items-center gap-1">
                   <GraduationCap className="h-3.5 w-3.5" />
-                  Grade {participant.grade}
+                  Grade {participant.grade ?? "—"}
                 </span>
                 <span className="opacity-30">|</span>
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5" />
-                  {participant.age} tahun
+                  {participant.age ?? "—"} tahun
                 </span>
                 <span className="opacity-30">|</span>
-                <span className="capitalize">{participant.gender}</span>
+                <span className="capitalize">{participant.gender ?? "—"}</span>
               </div>
             </div>
           </div>
@@ -61,12 +61,12 @@ export function ParticipantCard({ participant }) {
           <BioItem
             icon={<Ruler className="h-4 w-4" />}
             label="Tinggi"
-            value={`${participant.height} cm`}
+            value={participant.height != null ? `${participant.height} cm` : "—"}
           />
           <BioItem
             icon={<Weight className="h-4 w-4" />}
             label="Berat"
-            value={`${participant.weight} kg`}
+            value={participant.weight != null ? `${participant.weight} kg` : "—"}
           />
           <BioItem
             icon={<Heart className="h-4 w-4" />}
@@ -100,7 +100,7 @@ export function ParticipantCard({ participant }) {
           <BioItem
             icon={<User className="h-4 w-4" />}
             label="Gender"
-            value={<span className="capitalize">{participant.gender}</span>}
+            value={<span className="capitalize">{participant.gender ?? "—"}</span>}
           />
         </div>
       </CardContent>

@@ -73,7 +73,21 @@ function EmotionLegend({ payload }) {
 }
 
 export function EmotionPieChart({ data }) {
-  const chartData = (data || MOCK_DATA).map((item) => ({
+  const resolvedData = data?.length > 0 ? data : null;
+
+  if (!resolvedData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+        <span className="text-4xl opacity-40">😐</span>
+        <p className="font-medium text-muted-foreground">N/A (Game Mode)</p>
+        <p className="text-sm text-muted-foreground">
+          Data emosi tidak tersedia untuk sesi Pure Game.
+        </p>
+      </div>
+    );
+  }
+
+  const chartData = resolvedData.map((item) => ({
     ...item,
     color: EMOTION_COLORS[item.name] || "#6b7280",
   }));

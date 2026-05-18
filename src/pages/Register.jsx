@@ -123,7 +123,7 @@ export function Register() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="uid">UID (RFID) *</Label>
+              <Label htmlFor="uid">Barcode *</Label>
               <Input
                 id="uid"
                 name="uid"
@@ -131,12 +131,12 @@ export function Register() {
                 value={form.uid}
                 onChange={handleChange}
                 onKeyDown={handleUidScan}
-                placeholder="Scan RFID tag..."
+                placeholder="Scan barcode..."
                 required
                 autoFocus
               />
               <p className="text-xs text-muted-foreground">
-                Scanner RFID otomatis terdeteksi. Arahkan scanner ke field ini.
+                Scanner barcode otomatis terdeteksi. Arahkan scanner ke field ini.
               </p>
             </div>
 
@@ -160,10 +160,10 @@ export function Register() {
                   name="age"
                   type="number"
                   min={3}
-                  max={18}
+                  max={99}
                   value={form.age}
                   onChange={handleChange}
-                  placeholder="3-18"
+                  placeholder="3-99"
                   required
                 />
               </div>

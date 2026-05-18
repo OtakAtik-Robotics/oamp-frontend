@@ -374,8 +374,11 @@ export function Analytics() {
                   Dapatkan analisis kesehatan bertenaga AI
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  AI akan menganalisis data performa dan emosi peserta untuk
-                  memberikan rekomendasi kesehatan kognitif.
+                  AI akan menganalisis data performa peserta
+                  {sessions?.some((s) => s.emotion || s.face_tracking || s.voice)
+                    ? " dan emosi"
+                    : ""}{" "}
+                  untuk memberikan rekomendasi kesehatan kognitif.
                 </p>
               </div>
               <Button
@@ -618,7 +621,11 @@ export function Analytics() {
             </CardHeader>
             <CardContent>
               <PremiumLock locked={!isPremium}>
-                <EmotionPieChart />
+                <EmotionPieChart
+                  data={sessions?.flatMap((s) => s?.emotions ?? s?.emotion_data ?? []).filter(Boolean)?.length > 0
+                    ? sessions.flatMap((s) => s?.emotions ?? s?.emotion_data ?? []).filter(Boolean)
+                    : null}
+                />
               </PremiumLock>
               {!isPremium && (
                 <div className="mt-4 rounded-lg border border-dashed border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950 px-4 py-3 text-sm text-amber-800 dark:text-amber-200 text-center">

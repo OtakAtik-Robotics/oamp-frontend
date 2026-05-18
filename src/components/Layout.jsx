@@ -1,13 +1,14 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { StatusBanner } from "@/components/StatusBanner";
-import { Trophy, UserPlus, Download, LayoutDashboard, Users } from "lucide-react";
+import { Trophy, UserPlus, Download, LayoutDashboard, Users, Swords } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/participants", label: "Participants", icon: Users },
   { to: "/register", label: "Register", icon: UserPlus },
+  { to: "/competitif", label: "Competitif", icon: Swords },
   { to: "/export", label: "Export", icon: Download },
 ];
 
