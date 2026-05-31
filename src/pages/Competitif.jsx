@@ -21,7 +21,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Layers, AlertCircle, Swords, Trophy } from "lucide-react";
+import { Loader2, Layers, AlertCircle, Swords, Trophy, DoorOpen, Users } from "lucide-react";
 
 function getScore(row) {
   return row.score ?? null;
@@ -41,14 +41,25 @@ export function Competitif() {
 
   const batchParams =
     selectedBatchId !== "all"
-      ? { params: { batch_id: selectedBatchId } }
-      : { params: { batch_id: "all" } };
+      ? { params: { batch_id: selectedBatchId, mode: "competition" } }
+      : { params: { batch_id: "all", mode: "competition" } };
 
   const { data: boardRes, isLoading, isError } = useQuery({
-    queryKey: ["leaderboard-duel", selectedBatchId],
+    queryKey: ["leaderboard-duel", "competition", selectedBatchId],
     queryFn: () => api.get("/leaderboard", batchParams),
     refetchInterval: 5000,
   });
+
+  const { data: roomsRes } = useQuery({
+    queryKey: ["rooms-duel"],
+    queryFn: () => api.get("/rooms"),
+    refetchInterval: 3000,
+  });
+
+  const rooms = useMemo(() => {
+    const raw = roomsRes?.data?.data || roomsRes?.data || [];
+    return raw.filter((r) => ["waiting", "ready", "playing"].includes(r.status));
+  }, [roomsRes]);
 
   const data = useMemo(() => boardRes?.data?.data || boardRes?.data || [], [boardRes]);
 
@@ -136,6 +147,47 @@ export function Competitif() {
         <>
         {tab === "live" && (
           <div>
+            {/* ACTIVE ROOMS */}
+            {rooms.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-bold tracking-widest text-slate-400 uppercase mb-4 pl-2">Room Aktif</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {rooms.map((room) => (
+                    <Card
+                      key={room.id}
+                      className="cursor-pointer hover:shadow-md transition-all border-slate-200"
+                      onClick={() => navigate(`/match/${room.id}`)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge className={`text-[10px] px-2 py-0.5 ${
+                            room.status === "playing"
+                              ? "bg-green-100 text-green-700"
+                              : room.status === "ready"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-amber-100 text-amber-700"
+                          }`}>
+                            {room.status === "playing" ? "Berlangsung" : room.status === "ready" ? "Siap" : "Menunggu"}
+                          </Badge>
+                          <span className="text-[10px] font-mono text-slate-400">{room.id}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Users className="h-3.5 w-3.5 text-slate-400" />
+                          <span className="text-slate-600">
+                            {room.player1_name || "?"} vs {room.player2_name || "?"}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center gap-1 text-xs text-slate-400">
+                          <DoorOpen className="h-3 w-3" />
+                          <span>Klik untuk spectator →</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* ROOM SECTION */}
             {p1 && p2 ? (
               <div className="mb-10">

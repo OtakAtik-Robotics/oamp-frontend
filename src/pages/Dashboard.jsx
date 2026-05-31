@@ -139,17 +139,17 @@ export function Dashboard() {
 
   const batchParams =
     selectedBatchId !== "all"
-      ? { params: { batch_id: selectedBatchId } }
-      : { params: { batch_id: "all" } };
+      ? { params: { batch_id: selectedBatchId, mode: "training" } }
+      : { params: { batch_id: "all", mode: "training" } };
 
   const { data: boardRes, isLoading, isError, refetch: refetchBoard } = useQuery({
-    queryKey: ["leaderboard", selectedBatchId],
+    queryKey: ["leaderboard", "training", selectedBatchId],
     queryFn: () => api.get("/leaderboard", batchParams),
     refetchInterval: isReadOnly ? false : 5000,
   });
 
   const { data: timeRes, refetch: refetchTimeline } = useQuery({
-    queryKey: ["timeline", selectedBatchId],
+    queryKey: ["timeline", "training", selectedBatchId],
     queryFn: () => api.get("/leaderboard/timeline", batchParams),
     refetchInterval: isReadOnly ? false : 5000,
   });
