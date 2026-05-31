@@ -36,8 +36,8 @@ export function Paywall() {
 
   const { data: participant, isLoading, isError } = useQuery({
     queryKey: ["participant", uid],
-    queryFn: () => api.get(`/app/auth/${uid}`),
-    select: (res) => res.data?.participant,
+    queryFn: () => api.get(`/participants/uid/${uid}`),
+    select: (res) => res.data,
     retry: false,
   });
 
@@ -52,7 +52,7 @@ export function Paywall() {
       const checkoutRes = await api.post(`/payment/checkout/${uid}`);
       if (checkoutRes.status !== "success") throw new Error("Checkout failed");
 
-      const snapToken = checkoutRes.data?.snap_token;
+      const snapToken = checkoutRes.data?.token;
       const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
 
       if (clientKey && snapToken && window.snap) {
@@ -185,7 +185,18 @@ export function Paywall() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handlePay}
+            onClick={async () => {
+              setProcessing(true);
+              try {
+                await api.post(`/payment/simulate-success/${uid}`);
+                setPaid(true);
+                toast.success("✅ Simulasi lunas berhasil!");
+              } catch {
+                toast.error("❌ Gagal simulasi lunas.");
+              } finally {
+                setProcessing(false);
+              }
+            }}
             disabled={processing}
             className="w-full text-xs text-muted-foreground"
           >

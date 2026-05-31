@@ -22,6 +22,8 @@ export function useMatchWebSocket(roomId) {
   const retryRef = useRef(0);
   const timeoutRef = useRef(null);
 
+  const scheduleReconnect = useRef(() => {});
+
   const connect = useCallback(() => {
     if (!roomId) return;
 
@@ -39,7 +41,6 @@ export function useMatchWebSocket(roomId) {
         const msg = JSON.parse(event.data);
         setLastEvent(msg);
 
-        // GAME_OVER
         if (msg.type === "GAME_OVER") {
           setMatchStatus("finished");
           if (msg.player_id && PLAYER_MAP[msg.player_id]) {
@@ -56,7 +57,6 @@ export function useMatchWebSocket(roomId) {
           return;
         }
 
-        // join event
         if (msg.type === "join" && msg.player_id) {
           setPlayers((prev) => ({
             ...prev,
@@ -68,7 +68,6 @@ export function useMatchWebSocket(roomId) {
           return;
         }
 
-        // score_update event
         if (msg.type === "score_update" && msg.player_id) {
           setPlayers((prev) => ({
             ...prev,
@@ -81,7 +80,6 @@ export function useMatchWebSocket(roomId) {
           return;
         }
 
-        // leave event
         if (msg.type === "leave" && msg.player_id) {
           setPlayers((prev) => ({
             ...prev,
@@ -93,7 +91,6 @@ export function useMatchWebSocket(roomId) {
           return;
         }
 
-        // Direct player update (fallback for any message with player_id at top level)
         if (msg.player_id && PLAYER_MAP[msg.player_id]) {
           setPlayers((prev) => ({
             ...prev,
@@ -112,7 +109,7 @@ export function useMatchWebSocket(roomId) {
 
     ws.onclose = () => {
       setConnectionStatus("disconnected");
-      scheduleReconnect();
+      scheduleReconnect.current?.();
     };
 
     ws.onerror = () => {
@@ -120,11 +117,15 @@ export function useMatchWebSocket(roomId) {
     };
   }, [roomId]);
 
-  const scheduleReconnect = useCallback(() => {
-    const delay = Math.min(2000 * 2 ** retryRef.current, 16000);
-    retryRef.current += 1;
-    timeoutRef.current = setTimeout(connect, delay);
-  }, [connect]);
+  useEffect(() => {
+    scheduleReconnect.current = () => {
+      const delay = Math.min(2000 * 2 ** retryRef.current, 16000);
+      retryRef.current += 1;
+      timeoutRef.current = setTimeout(() => {
+        connect();
+      }, delay);
+    };
+  });
 
   useEffect(() => {
     connect();

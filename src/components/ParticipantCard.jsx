@@ -15,23 +15,17 @@ export function ParticipantCard({ participant }) {
   if (!participant) return null;
 
   return (
-    <Card className="overflow-hidden shadow-lg">
+    <Card className="overflow-hidden border border-slate-200 shadow-sm">
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-6 text-white overflow-hidden">
-        {/* Decorative circles */}
-        <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/5" />
-        <div className="absolute -bottom-4 -left-4 h-20 w-20 rounded-full bg-white/5" />
-
-        <div className="relative flex items-start justify-between">
+      <div className="relative bg-blue-600 px-6 py-6 text-white">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl font-bold shadow-inner">
+            <div className="h-16 w-16 rounded-2xl bg-white/15 flex items-center justify-center text-2xl font-bold">
               {participant.name?.charAt(0)?.toUpperCase()}
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">
-                {participant.name}
-              </h2>
-              <div className="flex items-center gap-3 mt-1.5 text-blue-200 text-sm">
+              <h2 className="text-2xl font-bold tracking-tight">{participant.name}</h2>
+              <div className="flex items-center gap-3 mt-1.5 text-blue-100 text-sm">
                 <span className="flex items-center gap-1">
                   <GraduationCap className="h-3.5 w-3.5" />
                   Grade {participant.grade ?? "—"}
@@ -46,10 +40,7 @@ export function ParticipantCard({ participant }) {
               </div>
             </div>
           </div>
-          <Badge
-            variant="secondary"
-            className="bg-white/15 text-white border-0 backdrop-blur-sm font-mono"
-          >
+          <Badge className="bg-white/15 text-white border-0 font-mono hover:bg-white/15">
             {participant.uid}
           </Badge>
         </div>

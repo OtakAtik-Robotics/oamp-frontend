@@ -11,6 +11,8 @@ import { Export } from "@/pages/Export";
 import { Participants } from "@/pages/Participants";
 import { Competitif } from "@/pages/Competitif";
 import { MatchDashboard } from "@/pages/MatchDashboard";
+import { Tournaments } from "@/pages/Tournaments";
+import { TournamentDetail } from "@/pages/TournamentDetail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,7 +36,9 @@ function App() {
               <Route path="/paywall/:uid" element={<Paywall />} />
               <Route path="/analytics/:uid" element={<Analytics />} />
               <Route path="/export" element={<Export />} />
-              <Route path="/competitif" element={<Competitif />} />
+              <Route path="/duel" element={<Competitif />} />
+              <Route path="/tournaments" element={<Tournaments />} />
+              <Route path="/tournament/:id" element={<TournamentDetail />} />
             </Route>
             <Route path="/match/:room_id" element={<MatchDashboard />} />
           </Routes>

@@ -55,7 +55,7 @@ export function Register() {
       if (!uid) return;
 
       try {
-        const res = await api.get(`/robot/auth/${uid}`);
+        const res = await api.get(`/participants/uid/${uid}`);
         if (res.data) {
           toast.info(`Peserta sudah terdaftar: ${res.data.name}`);
           return;
@@ -95,14 +95,10 @@ export function Register() {
       navigate(`/paywall/${newUid}`);
     } catch (err) {
       console.error("[Register] Failed:", err?.response?.status, err?.response?.data);
-      const msg =
-        err.response?.data?.message || "Gagal mendaftarkan peserta.";
-      if (
-        msg.toLowerCase().includes("duplicate") ||
-        msg.toLowerCase().includes("unique") ||
-        msg.toLowerCase().includes("failed to register")
-      ) {
-        toast.error("UID sudah terdaftar.");
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message || "Gagal mendaftarkan peserta.";
+      if (status === 409) {
+        toast.error("UID sudah terdaftar. Gunakan UID lain.");
       } else {
         toast.error(msg);
       }

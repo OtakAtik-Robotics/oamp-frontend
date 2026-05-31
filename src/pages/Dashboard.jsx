@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import api from "@/lib/axios";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
@@ -27,10 +27,14 @@ import {
   Gamepad2,
   UserPlus,
   Download,
-  Flame,
+  Trophy,
   Settings,
   Layers,
   Eye,
+  Pencil,
+  Trash2,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
 import {
   LineChart,
@@ -93,10 +97,14 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export function Dashboard() {
+  const queryClient = useQueryClient();
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [newSessionName, setNewSessionName] = useState("");
   const [startingSession, setStartingSession] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState("all");
+  const [editingBatchId, setEditingBatchId] = useState(null);
+  const [editBatchName, setEditBatchName] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   const { data: batchesRes } = useQuery({
     queryKey: ["batches"],
@@ -130,7 +138,9 @@ export function Dashboard() {
   const isReadOnly = !!(selectedBatch && !selectedBatch.is_active);
 
   const batchParams =
-    selectedBatchId !== "all" ? { params: { batch_id: selectedBatchId } } : {};
+    selectedBatchId !== "all"
+      ? { params: { batch_id: selectedBatchId } }
+      : { params: { batch_id: "all" } };
 
   const { data: boardRes, isLoading, isError, refetch: refetchBoard } = useQuery({
     queryKey: ["leaderboard", selectedBatchId],
@@ -155,6 +165,7 @@ export function Dashboard() {
       toast.success(`Sesi "${newSessionName.trim()}" berhasil dimulai!`);
       setNewSessionName("");
       setSessionDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
       await Promise.all([refetchBoard(), refetchTimeline()]);
     } catch {
       toast.error("Gagal memulai sesi baru. Server tidak tersedia.");
@@ -163,34 +174,49 @@ export function Dashboard() {
     }
   }
 
+  async function handleRenameBatch(id, name) {
+    try {
+      await api.put(`/batches/${id}`, { name });
+      toast.success("Sesi berhasil diubah namanya.");
+      setEditingBatchId(null);
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+    } catch {
+      toast.error("Gagal mengubah nama sesi.");
+    }
+  }
+
+  async function handleDeleteBatch(id) {
+    try {
+      await api.delete(`/batches/${id}`);
+      toast.success("Sesi berhasil dihapus.");
+      setDeleteConfirmId(null);
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+    } catch {
+      toast.error("Gagal menghapus sesi.");
+    }
+  }
+
+  async function handleActivateBatch(id) {
+    try {
+      await api.post(`/batches/${id}/activate`);
+      toast.success("Sesi diaktifkan.");
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      await Promise.all([refetchBoard(), refetchTimeline()]);
+    } catch {
+      toast.error("Gagal mengaktifkan sesi.");
+    }
+  }
+
   const leaderboard = useMemo(() => boardRes?.data?.data || boardRes?.data || [], [boardRes]);
   const rawTimeline = useMemo(() => timeRes?.data?.data || timeRes?.data || [], [timeRes]);
 
-  const [fireEvent, setFireEvent] = useState(null);
-  const prevRank1 = useRef(null);
-  const fireTimerRef = useRef(null);
-
-  useEffect(() => {
-    if (leaderboard.length > 0) {
-      const currentRank1 = leaderboard[0].name;
-      if (prevRank1.current && prevRank1.current !== currentRank1) {
-        if (fireTimerRef.current) clearTimeout(fireTimerRef.current);
-        setFireEvent(currentRank1);
-        fireTimerRef.current = setTimeout(() => setFireEvent(null), 4000);
-      }
-      prevRank1.current = currentRank1;
-    }
-    return () => {
-      if (fireTimerRef.current) clearTimeout(fireTimerRef.current);
-    };
-  }, [leaderboard]);
-
   const totalParticipants = leaderboard.length;
-  const bestScore = leaderboard.length > 0 ? leaderboard[0].score.toFixed(0) : "N/A";
-  const avgScore =
-    leaderboard.length > 0
-      ? (leaderboard.reduce((a, b) => a + b.score, 0) / leaderboard.length).toFixed(0)
-      : "N/A";
+  const best = leaderboard[0]?.score;
+  const bestScore = best != null ? best.toFixed(0) : "N/A";
+  const avg = leaderboard.length > 0
+    ? leaderboard.reduce((a, b) => a + (b.score || 0), 0) / Math.max(leaderboard.length, 1)
+    : 0;
+  const avgScore = leaderboard.length > 0 && !Number.isNaN(avg) ? avg.toFixed(0) : "N/A";
 
   const topPlayers = useMemo(
     () => leaderboard.slice(0, 8).map((p) => p.name),
@@ -238,17 +264,6 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6 relative">
-      {fireEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="flex flex-col items-center animate-bounce scale-125">
-            <Flame className="h-32 w-32 text-orange-500 fill-orange-500" />
-            <h1 className="text-5xl font-black text-white mt-4 tracking-wider text-center drop-shadow-[0_0_20px_rgba(239,68,68,0.9)]">
-              {fireEvent.toUpperCase()} TOP #1 !
-            </h1>
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <h1 className="text-2xl font-bold tracking-tight">OAMP Leaderboard</h1>
@@ -329,7 +344,7 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard title="Total Players" value={totalParticipants} icon={<Users className="h-5 w-5" />} color="blue" />
-        <StatCard title="Highest Score" value={bestScore} icon={<Flame className="h-5 w-5" />} color="amber" />
+        <StatCard title="Highest Score" value={bestScore} icon={<Trophy className="h-5 w-5" />} color="amber" />
         <StatCard title="Average Score" value={avgScore} icon={<Gamepad2 className="h-5 w-5" />} color="green" />
       </div>
 
@@ -475,7 +490,6 @@ export function Dashboard() {
                       className="h-2.5 w-2.5 rounded-full shrink-0 transition-all group-hover:scale-125"
                       style={{
                         backgroundColor: color,
-                        boxShadow: `0 0 ${index === 0 ? 10 : 5}px ${color}60`,
                       }}
                     />
                     <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">
@@ -508,40 +522,141 @@ export function Dashboard() {
       </Card>
 
       <Dialog open={sessionDialogOpen} onOpenChange={setSessionDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
               Manajemen Sesi
             </DialogTitle>
             <DialogDescription>
-              Buat sesi baru untuk me-reset leaderboard dan memulai kompetisi
-              fresh.
+              Kelola semua sesi event: ganti nama, hapus, atau aktifkan sesi.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Nama Sesi Baru
-              </label>
-              <Input
-                placeholder="Contoh: Sesi 1 - Putaran Pertama"
-                value={newSessionName}
-                onChange={(e) => setNewSessionName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleStartNewSession();
-                }}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
+          <div className="space-y-4 pt-2 max-h-[340px] overflow-y-auto">
+            {/* Batch list */}
+            {allBatches.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Belum ada sesi.
+              </p>
+            ) : (
+              <div className="space-y-1">
+                {allBatches.map((batch) => (
+                  <div
+                    key={batch.id}
+                    className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      {editingBatchId === batch.id ? (
+                        <div className="flex items-center gap-1 flex-1">
+                          <Input
+                            className="h-7 text-sm"
+                            value={editBatchName}
+                            onChange={(e) => setEditBatchName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleRenameBatch(batch.id, editBatchName);
+                              if (e.key === "Escape") setEditingBatchId(null);
+                            }}
+                            autoFocus
+                          />
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2"
+                            onClick={() => handleRenameBatch(batch.id, editBatchName)}
+                          >
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-sm font-medium truncate">
+                          {batch.name}
+                        </span>
+                      )}
+                      {batch.is_active && (
+                        <Badge className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0 shrink-0">
+                          Active
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      {!batch.is_active && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs"
+                          onClick={() => handleActivateBatch(batch.id)}
+                        >
+                          Aktifkan
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-1.5"
+                        onClick={() => {
+                          setEditingBatchId(batch.id);
+                          setEditBatchName(batch.name);
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      {deleteConfirmId === batch.id ? (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-7 text-xs px-2"
+                            onClick={() => handleDeleteBatch(batch.id)}
+                          >
+                            Yakin?
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 text-xs px-2"
+                            onClick={() => setDeleteConfirmId(null)}
+                          >
+                            Batal
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-1.5 text-red-500 hover:text-red-600"
+                          onClick={() => setDeleteConfirmId(batch.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Create new */}
+          <div className="border-t pt-4 space-y-3">
+            <p className="text-sm font-medium">Buat Sesi Baru</p>
+            <Input
+              placeholder="Contoh: Sesi 1 - Putaran Pertama"
+              value={newSessionName}
+              onChange={(e) => setNewSessionName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleStartNewSession();
+              }}
+            />
+            <div className="flex gap-2">
               <Button
                 onClick={handleStartNewSession}
                 disabled={startingSession}
-                className="w-full"
+                className="flex-1"
               >
                 {startingSession ? (
                   <>
-                    <Flame className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Memulai...
                   </>
                 ) : (
@@ -554,9 +669,8 @@ export function Dashboard() {
               <Button
                 variant="outline"
                 onClick={() => setSessionDialogOpen(false)}
-                className="w-full"
               >
-                Batal
+                Tutup
               </Button>
             </div>
           </div>
