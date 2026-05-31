@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 import api from "@/lib/axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import { cn } from "@/lib/utils";
 export function TournamentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { adminMode } = useAdminMode();
   const [registerOpen, setRegisterOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedUids, setSelectedUids] = useState([]);
@@ -233,7 +235,7 @@ export function TournamentDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {tournament.status === "registration" && (
+          {adminMode && tournament.status === "registration" && (
             <>
               <Button variant="outline" onClick={() => setRegisterOpen(true)}>
                 <UserPlus className="h-4 w-4 mr-2" />
@@ -351,7 +353,7 @@ export function TournamentDetail() {
                               </Link>
                             </div>
                           ) : (
-                            match.status !== "bye" && (
+                            adminMode && match.status !== "bye" && (
                               <div className="flex justify-center">
                                 <Button
                                   variant="ghost"
@@ -380,7 +382,7 @@ export function TournamentDetail() {
                             </Badge>
                           </div>
                           {/* Admin result input */}
-                          {(match.status === "ready" || match.status === "playing") && match.player1_id && match.player2_id && (
+                          {adminMode && (match.status === "ready" || match.status === "playing") && match.player1_id && match.player2_id && (
                             <div className="flex justify-center pt-1">
                               <Button
                                 variant="ghost"

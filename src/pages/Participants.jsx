@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,6 @@ import {
   Eye,
   Filter,
   Trash2,
-  AlertTriangle,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -40,12 +40,12 @@ import { cn } from "@/lib/utils";
 export function Participants() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { adminMode } = useAdminMode();
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
   const [downloadingRapor, setDownloadingRapor] = useState({});
   const [deleting, setDeleting] = useState({});
-  const [deletingAll, setDeletingAll] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState("all");
 
   const { data: batchesRes } = useQuery({
@@ -154,21 +154,7 @@ export function Participants() {
     }
   }
 
-  async function handleDeleteAll() {
-    if (!confirm("HAPUS SEMUA PESERTA?\n\nIni akan menghapus seluruh data peserta, sesi game, dan hasil assessment. Tindakan ini tidak bisa dibatalkan.")) return;
-    setDeletingAll(true);
-    try {
-      await api.delete("/participants/all");
-      toast.success("Semua peserta berhasil dihapus.");
-      queryClient.invalidateQueries({ queryKey: ["participants"] });
-      queryClient.invalidateQueries({ queryKey: ["batches"] });
-      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
-    } catch {
-      toast.error("Gagal menghapus semua peserta.");
-    } finally {
-      setDeletingAll(false);
-    }
-  }
+
 
   return (
     <div className="space-y-6">
@@ -183,22 +169,7 @@ export function Participants() {
             <Users className="h-3.5 w-3.5" />
             {participants.length} peserta
           </Badge>
-          {participants.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-              disabled={deletingAll}
-              onClick={handleDeleteAll}
-            >
-              {deletingAll ? (
-                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-              ) : (
-                <AlertTriangle className="h-4 w-4 mr-1.5" />
-              )}
-              Hapus Semua
-            </Button>
-          )}
+
         </div>
       </div>
 
@@ -373,22 +344,24 @@ export function Participants() {
                               <FileText className="h-4 w-4" />
                             )}
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-red-500"
-                            disabled={deleting[p.id]}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(p.id, p.name);
-                            }}
-                          >
-                            {deleting[p.id] ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
+                          {adminMode && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-400 hover:text-red-500"
+                              disabled={deleting[p.id]}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(p.id, p.name);
+                              }}
+                            >
+                              {deleting[p.id] ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-slate-500 text-sm">
