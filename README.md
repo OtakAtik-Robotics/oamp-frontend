@@ -1,8 +1,6 @@
 # OAMP Web Admin Dashboard
 
-Frontend dashboard untuk sistem **OAMP (Otak Atik Merah Putih)** — platform asesmen kognitif dan motorik anak menggunakan robotika. Mendukung leaderboard real-time, manajemen sesi kompetisi, konsultasi kesehatan berbasis AI, dan export laporan.
-
-**Live Demo**: [https://projectidek.dev](https://projectidek.dev)
+Frontend dashboard for the OAMP cognitive and motoric assessment platform using robotics. Supports real-time leaderboard, competition session management, AI health analysis, tournament brackets, 1v1 duel match spectating, and report exports.
 
 ## Tech Stack
 
@@ -17,143 +15,157 @@ Frontend dashboard untuk sistem **OAMP (Otak Atik Merah Putih)** — platform as
 | Data Fetching | TanStack React Query |
 | Icons | Lucide React |
 | Toast | Sonner |
-| Payment | Midtrans Snap (sandbox) |
+| Payment | Midtrans Snap |
 
 ## Prerequisites
 
 - **Node.js** >= 18
-- **OAMP Backend** — pastikan server backend berjalan dan CORS sudah dikonfigurasi
+- **OAMP Backend** running (CORS configured `AllowAllOrigins`)
 
 ## Getting Started
 
 ```bash
-# Install dependencies
 npm install
-
-# Copy environment file
 cp .env.example .env
-
-# Start dev server
 npm run dev
 ```
 
-Buka `http://localhost:5173` di browser.
+Open `http://localhost:5173` in browser.
 
 ## Environment Variables
 
 ```env
-VITE_API_URL=http://localhost:8080/api/v1                # Backend API
-VITE_MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxx          # Midtrans Snap sandbox
+VITE_API_URL=http://localhost:8080/api/v1
+VITE_MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxx
 ```
 
 ## Pages & Routes
 
-| Route | Description |
-|-------|-------------|
-| `/` | **Dashboard** — CTF-style leaderboard, podium, live timeline graph, session selector |
-| `/participants` | **All Participants** — Daftar peserta, search, sort, download rapor |
-| `/register` | **Registration** — Form registrasi + RFID scanner → redirect ke Paywall |
-| `/paywall/:uid` | **Paywall** — Bayar sebelum main, Midtrans Snap popup |
-| `/analytics/:uid` | **Participant Analytics** — Profil, sesi, chart, AI analysis (premium gate) |
-| `/export` | **Export** — Download Excel + PDF |
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Dashboard | CTF-style leaderboard, podium, timeline graph, session selector |
+| `/admin` | Admin | Read-only monitoring: stat cards, active rooms, tournaments, registrations |
+| `/participants` | Participants | All participants, search, sort, download rapor |
+| `/register` | Register | Registration form + RFID scanner -> redirect to Paywall |
+| `/paywall/:uid` | Paywall | Payment via Midtrans Snap popup |
+| `/analytics/:uid` | Analytics | Profile, sessions, charts, AI analysis (premium gate) |
+| `/export` | Export | Download Excel + PDF reports |
+| `/duel` | Competitif | 1v1 duel match overview |
+| `/tournaments` | Tournaments | Tournament list, create tournament |
+| `/tournament/:id` | TournamentDetail | Bracket view, match management |
+| `/match/:room_id` | MatchDashboard | Live match spectator (outside Layout) |
 
 ## User Flow
 
 ```
-Register → /paywall/:uid → Bayar (Midtrans/test) → ✅ LUNAS → Dashboard / Analytics
+Register -> /paywall/:uid -> Pay (Midtrans/simulate) -> LUNAS -> Dashboard / Analytics
 ```
 
-Non-premium → data di-blur (vital signs, emotions, AI analysis). Premium → full access.
+Non-premium: data blurred (vital signs, emotions, AI analysis). Premium: full access.
 
-## Demographics
+## Features
 
-Grades: `TK`, `SD`, `SMP`, `SMA`, `Mahasiswa`, `Umum`
-
-## Fitur Utama
-
-### Paywall (Freemium)
-- **Pay upfront**: Bayar sebelum main → `POST /payment/checkout/{uid}` → `snap_token` → `window.snap.pay()`
-- **Fallback**: Jika `VITE_MIDTRANS_CLIENT_KEY` tidak diset → `POST /payment/simulate-success/{uid}`
-- **Premium gate**: `participant.is_premium` → false = blur semua data (vital signs, emotion chart, AI analysis)
-- **Price**: Rp 10.000
+### Paywall
+- `POST /api/v1/payment/checkout/:uid` -> `snap_token` -> `window.snap.pay()`
+- Fallback: `POST /api/v1/payment/simulate-success/:uid` if `VITE_MIDTRANS_CLIENT_KEY` not set
+- `participant.is_premium` gates premium data display
 
 ### Session Management
-- **Manajemen Sesi**: Buat sesi baru untuk me-reset leaderboard dan memulai kompetisi fresh via tombol "Manajemen Sesi" di Dashboard
-- **Session Selector**: Dropdown untuk memilih sesi yang ingin dilihat (termasuk sesi lama)
-- **READ ONLY Mode**: Banner peringatan amber saat melihat sesi lama; auto-refresh dinonaktifkan
-- **API**: `POST /api/v1/batches` untuk membuat sesi, `GET /api/v1/batches` untuk daftar sesi
+- Session Selector on Dashboard: choose active or past session
+- Read-only mode (amber banner) when viewing old sessions; auto-refresh disabled
+- API: `GET/POST /api/v1/batches`
 
 ### AI Health Consultant
-- Analisis kesehatan bertenaga AI untuk setiap peserta
-- Mendukung response status: `success` dan `fallback`
-- Graceful degradation jika server AI offline
-- Toast notification untuk setiap state proses
-- Disclaimer bahwa hasil AI bersifat edukasi, bukan diagnosis medis
+- AI analysis per participant via `GET /api/v1/participants/analysis/:uid`
+- Supports `success` and `fallback` response statuses
+- Toast notifications for each state; disclaimer shown
 
-### Leaderboard Real-Time
-- CTF-style dengan podium visual untuk top 3 (crown/medal icons)
-- Gradient row untuk rank 1/2/3
+### Leaderboard
+- CTF-style with podium visuals for top 3
+- Gradient rows for rank 1/2/3
 - Live score timeline graph (3-layer: area fill, glow, main line)
-- Fire event overlay saat rank #1 berubah
-- Auto-refresh setiap 5 detik
+- Auto-refresh every 5 seconds
 
-## API Endpoints (Backend)
+### Tournament
+- Single-elimination bracket view
+- Create tournament, register players, start cup, manage matches
 
-| Method | Endpoint | Digunakan di |
-|--------|----------|-------------|
-| `GET` | `/health` | Health check (status banner), polling setiap 30 detik |
-| `GET` | `/api/v1/leaderboard` | Dashboard leaderboard (top 10) |
-| `GET` | `/api/v1/leaderboard/timeline` | Live score timeline graph |
-| `POST` | `/api/v1/participants` | Registration form |
-| `GET` | `/api/v1/robot/auth/{uid}` | RFID UID lookup |
-| `GET` | `/api/v1/app/auth/{uid}` | Analytics — profil + semua sesi |
-| `GET` | `/api/v1/participants/analysis/{uid}` | AI Health Consultant (payment-gated) |
-| `POST` | `/api/v1/payment/checkout/{uid}` | Midtrans checkout → snap_token |
-| `POST` | `/api/v1/payment/simulate-success/{uid}` | Test payment → set is_premium=true |
-| `GET` | `/api/v1/batches` | Session selector (Dashboard) |
-| `POST` | `/api/v1/batches` | Membuat sesi baru |
-| `GET` | `/export/excel` | Download Excel report |
-| `GET` | `/export/pdf` | Download PDF leaderboard |
-| `GET` | `/export/rapor/{uid}` | Download rapor PDF per peserta |
+### Admin Mode
+- PIN-protected (hardcoded `7890`)
+- Destructive actions (delete participant, start cup, create room, register players) hidden until unlocked
+- `/admin` page is read-only monitoring regardless of admin mode
+
+## API Endpoints Used
+
+| Method | Endpoint | Used In |
+|--------|----------|---------|
+| GET | `/health` | Health check banner (30s polling) |
+| GET | `/api/v1/leaderboard` | Dashboard leaderboard |
+| GET | `/api/v1/leaderboard/timeline` | Score timeline graph |
+| POST | `/api/v1/participants` | Registration form |
+| GET | `/api/v1/participants/uid/:uid` | RFID UID lookup |
+| GET | `/api/v1/participants/uid/:uid/sessions` | Analytics — sessions |
+| GET | `/api/v1/participants/analysis/:uid` | AI Health Consultant |
+| GET | `/api/v1/participants/lookup/:nickname` | Participant search |
+| DELETE | `/api/v1/participants/:id` | Delete participant (admin) |
+| POST | `/api/v1/payment/checkout/:uid` | Midtrans checkout |
+| POST | `/api/v1/payment/simulate-success/:uid` | Test payment |
+| GET | `/api/v1/batches` | Session selector |
+| POST | `/api/v1/batches` | Create session |
+| GET | `/api/v1/rooms` | Active room list |
+| POST | `/api/v1/rooms` | Create room |
+| GET | `/api/v1/tournaments` | Tournament list |
+| POST | `/api/v1/tournaments` | Create tournament |
+| GET | `/api/v1/tournaments/:id` | Tournament detail |
+| DELETE | `/api/v1/tournaments/:id` | Delete tournament |
+| POST | `/api/v1/tournaments/:id/start` | Start cup |
+| POST | `/api/v1/tournaments/:id/matches/:mid/result` | Submit match result |
+| GET | `/api/v1/export/excel` | Download Excel |
+| GET | `/api/v1/export/pdf` | Download PDF leaderboard |
+| GET | `/api/v1/export/rapor/:uid` | Download rapor PDF |
 
 ## Score Formula
 
-Leaderboard menggunakan formula composite score:
-
 ```
-score = (level_reached × 10) + (visuo_spatial_fit × 50) + (dexterity_score × 0.2)
+score = (level_reached x 10) + (visuo_spatial_fit x 50) + (dexterity_score x 0.2)
 ```
 
-- **level_reached** (1–8): bobot tertinggi, kontribusi 10–80 poin
-- **visuo_spatial_fit** (0–1): kontribusi 0–50 poin
-- **dexterity_score** (0–100): kontribusi 0–20 poin
+- **level_reached** (1-8): 10-80 points
+- **visuo_spatial_fit** (0-1): 0-50 points
+- **dexterity_score** (0-100): 0-20 points
 
-Range: 10–150 poin. Setiap pemain punya satu entry (best session-nya).
+Range: 10-150. One entry per participant (best session).
 
 ## Project Structure
 
 ```
 src/
   lib/
-    axios.js           # Axios instance + interceptors (unwrap { status, message, data })
-    utils.js           # cn() utility (clsx + tailwind-merge)
+    axios.js                  # Axios instance, unwraps { status, message, data }
+    utils.js                  # cn() utility (clsx + tailwind-merge)
   hooks/
-    useHealthCheck.js  # Polling GET /health setiap 30 detik
+    useHealthCheck.js         # Polling GET /health every 30s
+  contexts/                   # React context providers
   pages/
-    Dashboard.jsx      # / — leaderboard + score graph + session management
-    Participants.jsx   # /participants — semua peserta
-    Register.jsx        # /register — RFID-aware form → paywall redirect
-    Paywall.jsx         # /paywall/:uid — Midtrans payment gate
-    Analytics.jsx      # /analytics/:uid — analytics + AI consultant (premium blur)
-    Export.jsx         # /export — download Excel/PDF
+    Dashboard.jsx             # / — leaderboard + score graph + session management
+    Admin.jsx                 # /admin — read-only monitoring
+    Participants.jsx          # /participants — all participants
+    Register.jsx              # /register — RFID-aware form -> paywall redirect
+    Paywall.jsx               # /paywall/:uid — Midtrans payment gate
+    Analytics.jsx             # /analytics/:uid — analytics + AI (premium blur)
+    Export.jsx                # /export — download Excel/PDF
+    Competitif.jsx            # /duel — 1v1 duel overview
+    Tournaments.jsx           # /tournaments — tournament list
+    TournamentDetail.jsx      # /tournament/:id — bracket + match management
+    MatchDashboard.jsx        # /match/:room_id — live match spectator
   components/
-    Layout.jsx          # Navbar + header + Outlet
-    LeaderboardTable.jsx # Tabel ranking + podium top 3
-    ParticipantCard.jsx  # Profil card peserta
-    EmotionPieChart.jsx  # Donut pie + emotion bars
-    SessionBarChart.jsx  # Bar chart + level line
-    StatusBanner.jsx    # Online/offline indicator
-    ui/                # shadcn/ui components (Button, Card, Dialog, Select, etc.)
+    Layout.jsx                # Navbar + header + Outlet
+    ErrorBoundary.jsx         # Error boundary wrapper
+    LeaderboardTable.jsx      # Ranking table + podium top 3
+    ParticipantCard.jsx       # Participant profile card
+    SessionBarChart.jsx       # Bar chart + level line
+    StatusBanner.jsx          # Online/offline indicator
+    ui/                       # shadcn/ui components
 ```
 
 ## Scripts
@@ -163,15 +175,16 @@ npm run dev       # Dev server (Vite)
 npm run build     # Production build
 npm run lint      # ESLint
 npm run preview   # Preview production build
+npx playwright test  # E2E tests (needs dev server running)
 ```
 
-## Catatan Teknis
+## Notes
 
-- **RFID Scanner**: Scanner USB berfungsi sebagai keyboard HID. Field UID di halaman Register auto-focus dan mendeteksi input scanner secara otomatis via Enter key.
-- **Leaderboard**: CTF-style dengan podium visual untuk top 3, gradient row untuk rank 1/2/3, gap antar rank, crown/medal icons.
-- **Graph**: Line chart dengan 3 layer (area fill, glow, main line), monotone curve, custom dark tooltip, sorted by score, glow effect untuk champion line.
-- **Light/Dark Mode**: fully responsive — graph container, axis, tooltip, legend, dan card headers semua mengikuti tema sistem/browser via Tailwind `dark:` variant.
-- **Emotion Data**: Pie chart emosi menggunakan sample data. Endpoint `GET /api/v1/analytics/{participant_id}/emotions` belum tersedia di backend.
-- **Rapor**: Download PDF rapor per peserta tersedia di halaman Analytics dan di halaman Participants (tombol rapor per row).
-- **CORS**: Backend dikonfigurasi `AllowAllOrigins`, tidak perlu proxy.
-- **Session Management**: Sesi aktif ditampilkan sebagai badge di header Dashboard. Memilih sesi lama akan menonaktifkan auto-refresh dan menampilkan banner "READ ONLY".
+- **Axios interceptor** unwraps responses: components access `.data`, `.status`, `.message` directly (not `res.data.data`).
+- **RFID Scanner**: USB scanner acts as keyboard HID. UID field auto-focuses, detects scanner input via Enter key.
+- **Dark mode**: responsive via Tailwind `dark:` variant; uses `next-themes`.
+- **Emotion chart**: uses sample data until backend endpoint is available.
+- **CORS**: backend is `AllowAllOrigins`, no proxy needed.
+- **Path alias**: `@/` resolves to `src/`.
+- **Tailwind v4**: no `tailwind.config.js`; uses `@import "tailwindcss"` in `src/index.css`.
+- **E2E tests**: Playwright in `e2e/`. Backend must be running for full E2E flows; `test.skip()` when offline.
