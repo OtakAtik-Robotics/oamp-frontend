@@ -8,7 +8,7 @@ npm run dev         # Vite dev server → http://localhost:5173
 npm run build
 npm run lint        # ESLint only — no typecheck step
 npm run preview     # Preview production build
-npm run test:playwright -- npx playwright test   # E2E tests (needs dev/preview running)
+npx playwright test   # E2E tests (needs dev/preview running)
 ```
 
 ## Environment
