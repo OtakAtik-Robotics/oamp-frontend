@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, emoji: "🏠" },
-  { to: "/admin", label: "Admin", icon: Shield, emoji: "🛡️" },
   { to: "/participants", label: "Peserta", icon: Users, emoji: "👥" },
   { to: "/tournaments", label: "Cup", icon: Trophy, emoji: "🏆" },
   { to: "/register", label: "Daftar", icon: UserPlus, emoji: "✏️" },
