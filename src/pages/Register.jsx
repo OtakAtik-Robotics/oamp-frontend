@@ -109,9 +109,9 @@ export function Register() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+        <CardHeader className="bg-[#f3f4f6] border-b border-[#171717]">
+          <CardTitle className="flex items-center gap-2 text-[#171717] font-bold">
             <UserPlus className="h-5 w-5" />
             Registration Station
           </CardTitle>
@@ -130,6 +130,7 @@ export function Register() {
                 placeholder="Scan barcode..."
                 required
                 autoFocus
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
               <p className="text-xs text-muted-foreground">
                 Scanner barcode otomatis terdeteksi. Arahkan scanner ke field ini.
@@ -145,6 +146,7 @@ export function Register() {
                 onChange={handleChange}
                 placeholder="Nama peserta"
                 required
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
             </div>
 
@@ -159,9 +161,10 @@ export function Register() {
                   max={99}
                   value={form.age}
                   onChange={handleChange}
-                  placeholder="3-99"
-                  required
-                />
+                placeholder="3-99"
+                required
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+              />
               </div>
               <div className="space-y-2">
                 <Label>Grade *</Label>
@@ -171,7 +174,7 @@ export function Register() {
                     setForm((prev) => ({ ...prev, grade: val }))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl">
                     <SelectValue placeholder="Pilih kelas" />
                   </SelectTrigger>
                   <SelectContent>
@@ -216,9 +219,10 @@ export function Register() {
                   step={0.1}
                   value={form.height}
                   onChange={handleChange}
-                  placeholder="Tinggi badan"
-                  required
-                />
+                placeholder="Tinggi badan"
+                required
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+              />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="weight">Weight (kg) *</Label>
@@ -230,9 +234,10 @@ export function Register() {
                   step={0.1}
                   value={form.weight}
                   onChange={handleChange}
-                  placeholder="Berat badan"
-                  required
-                />
+                placeholder="Berat badan"
+                required
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+              />
               </div>
             </div>
 
@@ -248,6 +253,7 @@ export function Register() {
                   value={form.heart_rate}
                   onChange={handleChange}
                   placeholder="Optional"
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -261,6 +267,7 @@ export function Register() {
                   value={form.spo2}
                   onChange={handleChange}
                   placeholder="Optional"
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -274,6 +281,7 @@ export function Register() {
                   value={form.grip_strength}
                   onChange={handleChange}
                   placeholder="Optional"
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
                 />
               </div>
             </div>

@@ -19,10 +19,10 @@ const rankConfig = {
     gradient: "from-yellow-400 to-amber-500",
   },
   2: {
-    bg: "bg-gradient-to-r from-slate-50 via-gray-50 to-slate-50 dark:from-slate-800/30 dark:via-gray-800/30",
-    border: "border-l-4 border-l-slate-300",
-    badge: "bg-slate-300 text-slate-800",
-    gradient: "from-slate-300 to-slate-400",
+    bg: "bg-gradient-to-r from-[#f3f4f6] via-gray-50 to-[#f3f4f6] dark:from-gray-800 dark:via-gray-800",
+    border: "border-l-4 border-l-[#171717]",
+    badge: "bg-[#d1d5db] text-[#171717]",
+    gradient: "from-[#d1d5db] to-[#9ca3af]",
   },
   3: {
     bg: "bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 dark:from-orange-950/30 dark:via-amber-950/30",
@@ -144,7 +144,7 @@ export function LeaderboardTable({ data, loading }) {
                       1
                     </span>
                   ) : row.rank === 2 ? (
-                    <Medal className="h-5 w-5 text-slate-400 dark:text-slate-300 mx-auto" />
+                    <Medal className="h-5 w-5 text-muted-foreground mx-auto" />
                   ) : row.rank === 3 ? (
                     <Medal className="h-5 w-5 text-orange-400 mx-auto" />
                   ) : (
@@ -155,11 +155,11 @@ export function LeaderboardTable({ data, loading }) {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 shadow-sm",
+                        "h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 shadow-[2px_2px_0_0_#171717]",
                         row.rank === 1
                           ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white"
                           : row.rank === 2
-                          ? "bg-gradient-to-br from-slate-300 to-slate-400 text-white"
+                          ? "bg-gradient-to-br from-[#d1d5db] to-[#9ca3af] text-[#171717]"
                           : row.rank === 3
                           ? "bg-gradient-to-br from-orange-300 to-orange-400 text-white"
                           : "bg-gradient-to-br from-violet-400 to-purple-500 text-white"
@@ -168,7 +168,7 @@ export function LeaderboardTable({ data, loading }) {
                       {row.name?.charAt(0)?.toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                      <p className="font-bold text-sm group-hover:text-primary transition-colors">
                         {row.name}
                       </p>
                       <p className="text-xs text-muted-foreground">{row.age} th</p>
@@ -176,7 +176,7 @@ export function LeaderboardTable({ data, loading }) {
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge variant="outline" className="font-semibold text-xs rounded-lg">
+                  <Badge variant="outline" className="font-bold text-xs rounded-xl border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
                     {row.grade}
                   </Badge>
                 </TableCell>
@@ -226,8 +226,8 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
       text: "text-yellow-900",
     },
     2: {
-      bg: "from-slate-300 via-slate-350 to-slate-400",
-      text: "text-slate-800",
+      bg: "from-[#d1d5db] via-[#9ca3af] to-[#6b7280]",
+      text: "text-[#171717]",
     },
     3: {
       bg: "from-orange-300 via-orange-350 to-orange-400",
@@ -246,7 +246,7 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
       <div className="relative">
         <div
           className={cn(
-            "h-16 w-16 rounded-2xl bg-gradient-to-br flex items-center justify-center text-xl font-bold text-white shadow-sm group-hover:scale-110 transition-all duration-300",
+            "h-16 w-16 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl font-bold text-white shadow-[3px_3px_0_0_#171717] group-hover:scale-110 transition-all duration-300",
             c.bg
           )}
         >
@@ -256,10 +256,10 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
       <p className="font-bold text-sm mt-2.5 text-center group-hover:text-primary transition-colors">
         {name}
       </p>
-      <Badge variant="outline" className="text-[10px] mt-0.5 rounded-lg">{grade}</Badge>
+      <Badge variant="outline" className="text-[10px] mt-0.5 rounded-xl border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">{grade}</Badge>
       <div
         className={cn(
-          "w-32 mt-3 rounded-t-2xl bg-gradient-to-t flex flex-col items-center justify-start pt-4 pb-3 shadow-sm",
+          "w-32 mt-3 rounded-t-xl bg-gradient-to-t flex flex-col items-center justify-start pt-4 pb-3 shadow-[3px_3px_0_0_#171717]",
           c.bg,
           height
         )}
@@ -267,7 +267,7 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
         <span className={cn("text-3xl font-black tabular-nums", c.text)}>
           {score ?? "—"}
         </span>
-        <span className={cn("text-xs font-semibold opacity-70", c.text)}>
+        <span className={cn("text-xs font-bold opacity-70", c.text)}>
           pts
         </span>
       </div>

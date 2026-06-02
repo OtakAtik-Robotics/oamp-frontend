@@ -41,29 +41,29 @@ export function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40">
-        <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200">
+        <div className="bg-white border-b-2 border-[#171717]">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="h-10 w-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-sm transition-all group-hover:scale-105 duration-300">
+                <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] transition-all group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-[2px_2px_0_0_#171717]">
                   <span className="text-xl">🧩</span>
                 </div>
-                <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-500 rounded-full border-2 border-white" />
+                <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-[#10b981] rounded-full border-2 border-[#171717]" />
               </div>
               <div>
-                <span className="font-bold text-lg tracking-tight text-slate-900" style={{ fontFamily: '"Fredoka", sans-serif' }}>
+                <span className="font-bold text-xl tracking-tight text-foreground" style={{ fontFamily: '"Fredoka", sans-serif' }}>
                   OAMP
                 </span>
-                <span className="text-slate-500 text-sm font-medium ml-1.5">
+                <span className="text-muted-foreground text-sm font-bold ml-1.5">
                   Block Design Test
                 </span>
               </div>
             </Link>
 
             <div className="flex items-center gap-2">
-              <nav className="flex items-center gap-0.5 bg-slate-100/80 p-1 rounded-2xl backdrop-blur">
+              <nav className="flex items-center gap-1 bg-muted p-1.5 rounded-2xl border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]">
                 {navItems.map((item) => {
                   const isActive =
                     item.to === "/"
@@ -75,10 +75,10 @@ export function Layout() {
                       key={item.to}
                       to={item.to}
                       className={cn(
-                        "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
+                        "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold transition-all",
                         isActive
-                          ? "bg-white text-foreground shadow-sm scale-[1.02]"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white/60"
+                          ? "bg-white text-foreground border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]"
+                          : "text-muted-foreground hover:text-foreground hover:bg-white hover:border-2 hover:border-[#171717] hover:shadow-[3px_3px_0_0_#171717]"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
@@ -91,9 +91,9 @@ export function Layout() {
               {/* Admin mode toggle */}
               {adminMode ? (
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
-                  className="gap-1.5 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                  className="gap-1.5"
                   onClick={deactivate}
                   title="Admin mode aktif — klik untuk matikan"
                 >
@@ -102,9 +102,9 @@ export function Layout() {
                 </Button>
               ) : (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="gap-1.5 text-slate-400 hover:text-slate-600"
+                  className="gap-1.5"
                   onClick={() => {
                     setShowPinDialog(true);
                     setPinError(false);

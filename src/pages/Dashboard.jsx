@@ -327,7 +327,7 @@ export function Dashboard() {
       </div>
 
       {isReadOnly && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-md text-sm font-medium dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800 flex items-center gap-2">
+        <div className="bg-[#fef3c7] border-2 border-[#171717] text-[#171717] px-4 py-3 rounded-xl text-sm font-bold shadow-[4px_4px_0_0_#171717] flex items-center gap-2">
           <Eye className="h-4 w-4" />
           <span>
             Anda sedang melihat data sesi lama —{" "}
@@ -337,7 +337,7 @@ export function Dashboard() {
       )}
 
       {isError && (
-        <div className="bg-red-100 text-red-800 px-4 py-3 rounded-md text-sm font-medium dark:bg-red-900/30 dark:text-red-400">
+        <div className="bg-[#fee2e2] border-2 border-[#171717] text-[#171717] px-4 py-3 rounded-xl text-sm font-bold shadow-[4px_4px_0_0_#171717]">
           Gagal memuat leaderboard. Server offline.
         </div>
       )}
@@ -349,8 +349,8 @@ export function Dashboard() {
       </div>
 
       {processedTimeline.length > 0 && (
-        <div className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
-          <div className="bg-slate-100 dark:bg-slate-900 px-6 pt-5 pb-0">
+        <div className="rounded-2xl overflow-hidden border-2 border-[#171717] bg-white shadow-[4px_4px_0_0_#171717]">
+          <div className="bg-[#f3f4f6] px-6 pt-5 pb-0">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -470,7 +470,7 @@ export function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-950 px-6 py-5 border-t border-slate-200 dark:border-slate-800">
+          <div className="bg-[#f9fafb] px-6 py-5 border-t-2 border-[#171717]">
             <div className="flex flex-wrap gap-x-6 gap-y-3">
               {legendOrder.map((player, index) => {
                 const colorIndex = topPlayers.indexOf(player);
@@ -509,9 +509,9 @@ export function Dashboard() {
         </div>
       )}
 
-      <Card className="shadow-lg overflow-hidden">
-        <CardHeader className="bg-slate-100 dark:bg-slate-900 py-4">
-          <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-white">
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-[#f3f4f6] py-4 border-b-2 border-[#171717]">
+          <CardTitle className="flex items-center gap-2 text-[#171717]">
             <Users className="h-5 w-5" />
             Global Rankings
           </CardTitle>
@@ -543,7 +543,7 @@ export function Dashboard() {
                 {allBatches.map((batch) => (
                   <div
                     key={batch.id}
-                    className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2"
+                    className="flex items-center justify-between gap-2 rounded-xl border-2 border-[#171717] bg-white px-3 py-2 shadow-[3px_3px_0_0_#171717]"
                   >
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       {editingBatchId === batch.id ? (
@@ -573,7 +573,7 @@ export function Dashboard() {
                         </span>
                       )}
                       {batch.is_active && (
-                        <Badge className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0 shrink-0">
+                        <Badge className="bg-[#10b981] text-white text-[10px] px-1.5 py-0 shrink-0 border-[#171717]">
                           Active
                         </Badge>
                       )}
@@ -681,9 +681,9 @@ export function Dashboard() {
 }
 
 const colorMap = {
-  blue: "bg-blue-100 text-blue-600",
-  amber: "bg-amber-100 text-amber-600",
-  green: "bg-green-100 text-green-600",
+  blue: "bg-[#4f46e5] text-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
+  amber: "bg-[#fbbf24] text-[#171717] border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
+  green: "bg-[#10b981] text-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
 };
 
 function StatCard({ title, value, icon, color }) {

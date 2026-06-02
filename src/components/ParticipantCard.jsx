@@ -15,12 +15,12 @@ export function ParticipantCard({ participant }) {
   if (!participant) return null;
 
   return (
-    <Card className="overflow-hidden border border-slate-200 shadow-sm">
+    <Card className="overflow-hidden border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
       {/* Header */}
       <div className="relative bg-blue-600 px-6 py-6 text-white">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-white/15 flex items-center justify-center text-2xl font-bold">
+            <div className="h-16 w-16 rounded-xl bg-blue-400 flex items-center justify-center text-2xl font-bold">
               {participant.name?.charAt(0)?.toUpperCase()}
             </div>
             <div>
@@ -40,7 +40,7 @@ export function ParticipantCard({ participant }) {
               </div>
             </div>
           </div>
-          <Badge className="bg-white/15 text-white border-0 font-mono hover:bg-white/15">
+          <Badge className="bg-blue-400 text-white border-2 border-[#171717] shadow-[2px_2px_0_0_#171717] font-mono hover:bg-blue-400">
             {participant.uid}
           </Badge>
         </div>
@@ -101,21 +101,21 @@ export function ParticipantCard({ participant }) {
 
 function BioItem({ icon, label, value, accent }) {
   const accentMap = {
-    red: "border-red-200 bg-red-50",
-    blue: "border-blue-200 bg-blue-50",
+    red: "border-2 border-[#171717] bg-red-50",
+    blue: "border-2 border-[#171717] bg-blue-50",
   };
 
   return (
     <div
-      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 ${
-        accent ? accentMap[accent] : "bg-slate-50/50"
+      className={`flex flex-col items-center gap-1.5 rounded-xl border-2 border-[#171717] shadow-[2px_2px_0_0_#171717] p-3 ${
+        accent ? accentMap[accent] : "bg-[#f3f4f6]"
       }`}
     >
       <span className="text-muted-foreground">{icon}</span>
-      <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
         {label}
       </span>
-      <span className="text-sm font-semibold">{value}</span>
+      <span className="text-sm font-bold">{value}</span>
     </div>
   );
 }

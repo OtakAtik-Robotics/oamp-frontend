@@ -14,15 +14,15 @@ import {
 function SessionTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
   return (
-    <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-xl text-sm space-y-1.5">
-      <p className="font-bold text-slate-800">Session {label}</p>
+    <div className="bg-white border-2 border-[#171717] rounded-xl px-4 py-3 shadow-[4px_4px_0_0_#171717] text-sm space-y-1.5">
+      <p className="font-bold text-[#171717]">Session {label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="flex items-center gap-2">
           <span
             className="inline-block h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-slate-600">{entry.name}:</span>
+          <span className="text-muted-foreground">{entry.name}:</span>
           <span className="font-bold" style={{ color: entry.color }}>
             {typeof entry.value === "number" ? entry.value : entry.value}
           </span>
@@ -70,17 +70,17 @@ export function SessionBarChart({ sessions }) {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#e2e8f0"
+              stroke="#e5e7eb"
               vertical={false}
             />
             <XAxis
               dataKey="session"
-              tick={{ fontSize: 12, fill: "#64748b", fontWeight: 600 }}
-              axisLine={{ stroke: "#e2e8f0" }}
+              tick={{ fontSize: 12, fill: "#6b7280", fontWeight: 700 }}
+              axisLine={{ stroke: "#e5e7eb" }}
             />
             <YAxis
               domain={[0, "auto"]}
-              tick={{ fontSize: 12, fill: "#64748b" }}
+              tick={{ fontSize: 12, fill: "#6b7280" }}
               width={45}
               axisLine={false}
               tickLine={false}

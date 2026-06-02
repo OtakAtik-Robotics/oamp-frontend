@@ -212,11 +212,11 @@ export function TournamentDetail() {
   };
 
   const statusBadge = {
-    scheduled: "bg-slate-100 text-slate-600",
-    ready: "bg-blue-100 text-blue-700",
-    playing: "bg-amber-100 text-amber-700",
-    finished: "bg-green-100 text-green-700",
-    bye: "bg-slate-50 text-slate-400",
+    scheduled: "bg-[#f3f4f6] text-[#171717] border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    ready: "bg-blue-100 text-blue-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    playing: "bg-amber-100 text-amber-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    finished: "bg-green-100 text-green-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    bye: "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
   };
 
   return (
@@ -228,8 +228,8 @@ export function TournamentDetail() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{tournament.name || "Cup"}</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-bold tracking-tight text-[#171717]">{tournament.name || "Cup"}</h1>
+            <p className="text-sm text-muted-foreground">
               {tournament.player_count || 0}/{tournament.max_players || 0} peserta — Ronde {tournament.current_round || 0}
             </p>
           </div>
@@ -248,12 +248,12 @@ export function TournamentDetail() {
             </>
           )}
           {tournament.status === "in_progress" && (
-            <Badge className="bg-green-100 text-green-700 border-green-200">
+            <Badge className="bg-green-100 text-green-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
               <Swords className="h-3 w-3 mr-1" /> Berlangsung
             </Badge>
           )}
           {tournament.status === "finished" && (
-            <Badge className="bg-slate-100 text-slate-600 border-slate-200">
+            <Badge className="bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
               <CheckCircle className="h-3 w-3 mr-1" /> Selesai
             </Badge>
           )}
@@ -261,19 +261,19 @@ export function TournamentDetail() {
       </div>
 
       {/* Players */}
-      <Card className="border border-slate-200 shadow-sm">
+      <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
         <CardContent className="p-4">
-          <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-bold text-[#171717] mb-3 flex items-center gap-2">
             <Users className="h-4 w-4" /> Peserta ({players.length})
           </h3>
           <div className="flex flex-wrap gap-2">
             {players.map((p) => (
-              <Badge key={p.id} variant="outline" className="text-xs px-2 py-1">
+              <Badge key={p.id} variant="outline" className="text-xs px-2 py-1 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
                 #{p.seed} {p.name}
               </Badge>
             ))}
             {players.length === 0 && (
-              <span className="text-sm text-slate-400">Belum ada peserta. Klik &quot;Daftarkan Peserta&quot; untuk memilih.</span>
+              <span className="text-sm text-muted-foreground">Belum ada peserta. Klik &quot;Daftarkan Peserta&quot; untuk memilih.</span>
             )}
           </div>
         </CardContent>
@@ -282,11 +282,11 @@ export function TournamentDetail() {
       {/* Bracket */}
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : matches.length === 0 ? (
-        <div className="text-center py-12 text-slate-400">
-          <Trophy className="h-10 w-10 mx-auto mb-3 text-slate-300" />
+        <div className="text-center py-12 text-muted-foreground">
+          <Trophy className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
           <p>Belum ada bracket.</p>
           <p className="text-sm">Mulai cup untuk generate bracket.</p>
         </div>
@@ -309,21 +309,21 @@ export function TournamentDetail() {
                     <div key={match.id} className="relative">
                       <Card
                         className={cn(
-                          "w-56 transition-all hover:shadow-md border",
-                          isReady ? "border-blue-300 bg-blue-50" : "border-slate-200"
+                          "w-56 transition-all hover:shadow-[5px_5px_0_0_#171717] border-2 border-[#171717] rounded-xl shadow-[4px_4px_0_0_#171717]",
+                          isReady && "bg-blue-50"
                         )}
                       >
                         <CardContent className="p-3 space-y-2">
                           {/* Player 1 */}
                           <div className={cn(
                             "flex items-center justify-between text-sm",
-                            p1Winner ? "font-bold text-slate-900" : "text-slate-600",
-                            isBye && !match.player1_id && "text-slate-300"
+                            p1Winner ? "font-bold text-[#171717]" : "text-muted-foreground",
+                            isBye && !match.player1_id && "text-muted-foreground"
                           )}>
                             <span className="truncate">{match.player1_name || "TBD"}</span>
                           </div>
                           {/* Score */}
-                          <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+                          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                             <span className="font-mono">{match.player1_score || 0}</span>
                             <span>—</span>
                             <span className="font-mono">{match.player2_score || 0}</span>
@@ -331,15 +331,15 @@ export function TournamentDetail() {
                           {/* Player 2 */}
                           <div className={cn(
                             "flex items-center justify-between text-sm",
-                            p2Winner ? "font-bold text-slate-900" : "text-slate-600",
-                            isBye && !match.player2_id && "text-slate-300"
+                            p2Winner ? "font-bold text-[#171717]" : "text-muted-foreground",
+                            isBye && !match.player2_id && "text-muted-foreground"
                           )}>
                             <span className="truncate">{match.player2_name || "TBD"}</span>
                           </div>
                           {/* Room code + spectator */}
                           {match.room_id ? (
                             <div className="flex justify-center gap-2">
-                              <Badge variant="outline" className="text-[10px] font-mono">
+                              <Badge variant="outline" className="text-[10px] font-mono border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
                                 Room: {match.room_id}
                               </Badge>
                               <Link
@@ -402,7 +402,7 @@ export function TournamentDetail() {
                       </Card>
                       {/* Connector lines to next round */}
                       {parseInt(round) < Math.max(...roundKeys.map(Number)) && (
-                        <div className="absolute top-1/2 -right-8 w-8 h-px bg-slate-300" />
+                        <div className="absolute top-1/2 -right-8 w-8 h-px bg-[#171717]" />
                       )}
                     </div>
                   );
@@ -421,7 +421,7 @@ export function TournamentDetail() {
           setSelectedUids([]);
         }
       }}>
-        <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col">
+        <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
           <DialogHeader>
             <DialogTitle>Daftarkan Peserta ke Cup</DialogTitle>
             <DialogDescription>Pilih peserta dari daftar yang terdaftar.</DialogDescription>
@@ -430,12 +430,12 @@ export function TournamentDetail() {
           <div className="space-y-3 pt-2 flex-1 min-h-0 flex flex-col">
             {/* Search */}
             <div className="relative shrink-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Cari nama atau UID..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
+                className="pl-9 border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
             </div>
 
@@ -448,7 +448,7 @@ export function TournamentDetail() {
                     <Badge
                       key={uid}
                       variant="secondary"
-                      className="cursor-pointer gap-1 pr-1.5"
+                      className="cursor-pointer gap-1 pr-1.5 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]"
                       onClick={() => removeUid(uid)}
                     >
                       {p?.name || uid}
@@ -460,38 +460,38 @@ export function TournamentDetail() {
             )}
 
             {/* Participant list */}
-            <div className="flex-1 min-h-0 overflow-y-auto border rounded-md bg-white">
+            <div className="flex-1 min-h-0 overflow-y-auto border-2 border-[#171717] rounded-xl bg-white shadow-[3px_3px_0_0_#171717]">
               {loadingParticipants ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
               ) : filtered.length === 0 ? (
-                <div className="text-center py-8 text-sm text-slate-400">
+                <div className="text-center py-8 text-sm text-muted-foreground">
                   {allParticipants.length === 0
                     ? "Belum ada peserta terdaftar."
                     : "Tidak ada peserta yang cocok."}
                 </div>
               ) : (
-                <div className="divide-y">
+                <div className="divide-y divide-[#171717]">
                   {filtered.map((p) => {
                     const checked = selectedUids.includes(p.uid);
                     return (
                       <label
                         key={p.id}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors",
+                          "flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[#f3f4f6] transition-colors",
                           checked && "bg-blue-50"
                         )}
                       >
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          className="h-4 w-4 rounded border-2 border-[#171717] text-blue-600 focus:ring-blue-500"
                           checked={checked}
                           onChange={() => toggleUid(p.uid)}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 truncate">{p.name}</p>
-                          <p className="text-xs text-slate-500 font-mono">{p.uid}</p>
+                          <p className="text-sm font-bold text-[#171717] truncate">{p.name}</p>
+                          <p className="text-xs text-muted-foreground font-mono">{p.uid}</p>
                         </div>
                         {checked && <CheckCircle className="h-4 w-4 text-blue-600 shrink-0" />}
                       </label>
@@ -526,7 +526,7 @@ export function TournamentDetail() {
         setResultOpen(open);
         if (!open) setResultMatch(null);
       }}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
           <DialogHeader>
             <DialogTitle>Input Hasil Pertandingan</DialogTitle>
             <DialogDescription>
@@ -536,7 +536,7 @@ export function TournamentDetail() {
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-slate-700">Skor {resultMatch?.player1_name}</label>
+                <label className="text-xs font-bold text-[#171717]">Skor {resultMatch?.player1_name}</label>
                 <Input
                   type="number"
                   min="0"
@@ -544,10 +544,11 @@ export function TournamentDetail() {
                   value={p1Score}
                   onChange={(e) => setP1Score(e.target.value)}
                   placeholder="0"
+                  className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-700">Skor {resultMatch?.player2_name}</label>
+                <label className="text-xs font-bold text-[#171717]">Skor {resultMatch?.player2_name}</label>
                 <Input
                   type="number"
                   min="0"
@@ -555,11 +556,12 @@ export function TournamentDetail() {
                   value={p2Score}
                   onChange={(e) => setP2Score(e.target.value)}
                   placeholder="0"
+                  className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-700">Pemenang</label>
+              <label className="text-xs font-bold text-[#171717]">Pemenang</label>
               <div className="mt-1.5 space-y-2">
                 {resultMatch?.player1_id && (
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -571,7 +573,7 @@ export function TournamentDetail() {
                       onChange={(e) => setWinnerId(e.target.value)}
                       className="h-4 w-4 text-blue-600"
                     />
-                    <span className="text-sm text-slate-900">{resultMatch.player1_name}</span>
+                    <span className="text-sm text-[#171717]">{resultMatch.player1_name}</span>
                   </label>
                 )}
                 {resultMatch?.player2_id && (
@@ -584,7 +586,7 @@ export function TournamentDetail() {
                       onChange={(e) => setWinnerId(e.target.value)}
                       className="h-4 w-4 text-blue-600"
                     />
-                    <span className="text-sm text-slate-900">{resultMatch.player2_name}</span>
+                    <span className="text-sm text-[#171717]">{resultMatch.player2_name}</span>
                   </label>
                 )}
               </div>

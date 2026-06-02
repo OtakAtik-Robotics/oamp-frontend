@@ -46,8 +46,8 @@ export function Admin() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Event Control Center</h1>
-        <p className="text-sm text-slate-500">Monitoring real-time — read only, tidak ada tombol hapus di sini.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Event Control Center</h1>
+        <p className="text-sm text-muted-foreground">Monitoring real-time — read only, tidak ada tombol hapus di sini.</p>
       </div>
 
       {/* Stats Cards */}
@@ -60,9 +60,9 @@ export function Admin() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Active Rooms */}
-        <Card className="border border-slate-200 shadow-sm">
-          <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-            <CardTitle className="text-slate-800 text-base font-semibold flex items-center gap-2">
+        <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+          <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
+            <CardTitle className="text-[#171717] text-base font-bold flex items-center gap-2">
               <Radio className="h-4 w-4 text-rose-500" />
               Room Aktif ({activeRooms.length})
             </CardTitle>
@@ -70,28 +70,28 @@ export function Admin() {
           <CardContent className="p-0">
             {rLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : activeRooms.length === 0 ? (
-              <div className="text-center py-8 text-slate-400 text-sm">Tidak ada room aktif.</div>
+              <div className="text-center py-8 text-muted-foreground text-sm">Tidak ada room aktif.</div>
             ) : (
               <div className="divide-y">
                 {activeRooms.map((room) => (
-                  <div key={room.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors">
+                  <div key={room.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#f3f4f6] transition-colors">
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="font-mono text-xs">
+                      <Badge variant="outline" className="font-mono text-xs border-2 border-[#171717]">
                         {room.id}
                       </Badge>
                       <div className="text-sm">
-                        <span className="font-medium text-slate-900">{room.player1_name}</span>
-                        <span className="text-slate-400 mx-1.5">vs</span>
-                        <span className="font-medium text-slate-900">{room.player2_name || "…"}</span>
+                        <span className="font-bold text-[#171717]">{room.player1_name}</span>
+                        <span className="text-muted-foreground mx-1.5">vs</span>
+                        <span className="font-bold text-[#171717]">{room.player2_name || "…"}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={statusBg(room.status)}>{room.status}</Badge>
                       <Link to={`/match/${room.id}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600">
                           <Eye className="h-4 w-4" />
                         </Button>
                       </Link>
@@ -104,9 +104,9 @@ export function Admin() {
         </Card>
 
         {/* Tournaments */}
-        <Card className="border border-slate-200 shadow-sm">
-          <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-            <CardTitle className="text-slate-800 text-base font-semibold flex items-center gap-2">
+        <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+          <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
+            <CardTitle className="text-[#171717] text-base font-bold flex items-center gap-2">
               <Trophy className="h-4 w-4 text-amber-500" />
               Turnamen ({tournaments.length})
             </CardTitle>
@@ -114,27 +114,27 @@ export function Admin() {
           <CardContent className="p-0">
             {tLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : tournaments.length === 0 ? (
-              <div className="text-center py-8 text-slate-400 text-sm">Belum ada turnamen.</div>
+              <div className="text-center py-8 text-muted-foreground text-sm">Belum ada turnamen.</div>
             ) : (
               <div className="divide-y">
                 {tournaments.map((t) => (
                   <Link
                     key={t.id}
                     to={`/tournament/${t.id}`}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors group"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-[#f3f4f6] transition-colors group"
                   >
                     <div>
-                      <p className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{t.name}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-sm font-bold text-[#171717] group-hover:text-blue-600 transition-colors">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">
                         {t.player_count}/{t.max_players} peserta — Ronde {t.current_round || 0}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={tournamentStatusBg(t.status)}>{t.status}</Badge>
-                      <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-blue-400" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-400" />
                     </div>
                   </Link>
                 ))}
@@ -145,9 +145,9 @@ export function Admin() {
       </div>
 
       {/* Recent registrations */}
-      <Card className="border border-slate-200 shadow-sm">
-        <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-          <CardTitle className="text-slate-800 text-base font-semibold flex items-center gap-2">
+        <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+        <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
+          <CardTitle className="text-[#171717] text-base font-bold flex items-center gap-2">
             <Users className="h-4 w-4 text-blue-500" />
             Peserta Terbaru
           </CardTitle>
@@ -155,15 +155,15 @@ export function Admin() {
         <CardContent className="p-0">
           {pLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : participants.length === 0 ? (
-            <div className="text-center py-8 text-slate-400 text-sm">Belum ada peserta.</div>
+            <div className="text-center py-8 text-muted-foreground text-sm">Belum ada peserta.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                  <tr className="border-b border-[#171717] text-muted-foreground text-xs uppercase tracking-wider">
                     <th className="px-4 py-2 text-left">Nama</th>
                     <th className="px-4 py-2 text-left">UID</th>
                     <th className="px-4 py-2 text-left">Kelas</th>
@@ -176,18 +176,18 @@ export function Admin() {
                     .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
                     .slice(0, 8)
                     .map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-4 py-2.5 font-medium text-slate-900">{p.name}</td>
-                        <td className="px-4 py-2.5 font-mono text-xs text-slate-500">{p.uid}</td>
-                        <td className="px-4 py-2.5 text-slate-600">{p.grade}</td>
+                      <tr key={p.id} className="hover:bg-[#f3f4f6] transition-colors">
+                        <td className="px-4 py-2.5 font-bold text-[#171717]">{p.name}</td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{p.uid}</td>
+                        <td className="px-4 py-2.5 text-muted-foreground">{p.grade}</td>
                         <td className="px-4 py-2.5 text-center">
                           {p.is_premium ? (
-                            <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">Premium</Badge>
+                            <Badge className="bg-amber-100 text-amber-700 border-2 border-[#171717] text-[10px]">Premium</Badge>
                           ) : (
-                            <span className="text-slate-300 text-xs">—</span>
+                            <span className="text-muted-foreground text-xs">—</span>
                           )}
                         </td>
-                        <td className="px-4 py-2.5 text-right text-slate-500 text-xs">
+                        <td className="px-4 py-2.5 text-right text-muted-foreground text-xs">
                           {p.created_at
                             ? new Date(p.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
                             : "—"}
@@ -212,10 +212,10 @@ function StatCard({ icon, label, value, color }) {
     emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
   };
   return (
-    <div className={cn("flex items-center gap-3 rounded-xl border p-4", colorMap[color])}>
-      <div className="p-2 rounded-lg bg-white shadow-sm">{icon}</div>
+    <div className={cn("flex items-center gap-3 rounded-xl border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] p-4", colorMap[color])}>
+      <div className="p-2 rounded-lg bg-white shadow-[2px_2px_0_0_#171717]">{icon}</div>
       <div>
-        <p className="text-xs font-medium opacity-70 uppercase tracking-wide">{label}</p>
+        <p className="text-xs font-bold opacity-70 uppercase tracking-wide">{label}</p>
         <p className="text-2xl font-bold">{value}</p>
       </div>
     </div>
@@ -224,20 +224,20 @@ function StatCard({ icon, label, value, color }) {
 
 function statusBg(status) {
   switch (status) {
-    case "waiting": return "bg-slate-100 text-slate-600";
-    case "ready": return "bg-blue-100 text-blue-700";
-    case "playing": return "bg-amber-100 text-amber-700";
-    default: return "bg-slate-100 text-slate-600";
+    case "waiting": return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
+    case "ready": return "bg-blue-100 text-blue-700 border-2 border-[#171717]";
+    case "playing": return "bg-amber-100 text-amber-700 border-2 border-[#171717]";
+    default: return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
   }
 }
 
 function tournamentStatusBg(status) {
   switch (status) {
-    case "registration": return "bg-slate-100 text-slate-600";
-    case "ready": return "bg-blue-100 text-blue-700";
-    case "in_progress": return "bg-amber-100 text-amber-700";
-    case "finished": return "bg-green-100 text-green-700";
-    default: return "bg-slate-100 text-slate-600";
+    case "registration": return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
+    case "ready": return "bg-blue-100 text-blue-700 border-2 border-[#171717]";
+    case "in_progress": return "bg-amber-100 text-amber-700 border-2 border-[#171717]";
+    case "finished": return "bg-green-100 text-green-700 border-2 border-[#171717]";
+    default: return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
   }
 }
 

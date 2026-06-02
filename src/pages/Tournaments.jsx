@@ -72,10 +72,10 @@ export function Tournaments() {
   }
 
   const statusColor = {
-    registration: "bg-blue-100 text-blue-700 border-blue-200",
-    ready: "bg-amber-100 text-amber-700 border-amber-200",
-    in_progress: "bg-green-100 text-green-700 border-green-200",
-    finished: "bg-slate-100 text-slate-600 border-slate-200",
+    registration: "bg-blue-100 text-blue-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    ready: "bg-amber-100 text-amber-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    in_progress: "bg-green-100 text-green-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    finished: "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
   };
 
   const statusLabel = {
@@ -89,8 +89,8 @@ export function Tournaments() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Turnamen Cup</h1>
-          <p className="text-sm text-slate-500">Kelola single-elimination cup</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Turnamen Cup</h1>
+          <p className="text-sm text-muted-foreground">Kelola single-elimination cup</p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -100,11 +100,11 @@ export function Tournaments() {
 
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : tournaments.length === 0 ? (
-        <div className="text-center py-12 text-slate-400">
-          <Trophy className="h-10 w-10 mx-auto mb-3 text-slate-300" />
+        <div className="text-center py-12 text-muted-foreground">
+          <Trophy className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
           <p>Belum ada cup.</p>
           <Button variant="outline" className="mt-4" onClick={() => setCreateOpen(true)}>
             Buat Cup Pertama
@@ -115,19 +115,19 @@ export function Tournaments() {
           {tournaments.map((t) => (
             <Card
               key={t.id}
-              className="cursor-pointer hover:shadow-md transition-all border-slate-200"
+              className="cursor-pointer hover:shadow-[5px_5px_0_0_#171717] transition-all border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl"
               onClick={() => navigate(`/tournament/${t.id}`)}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg font-bold text-slate-900">{t.name}</CardTitle>
+                  <CardTitle className="text-lg font-bold text-[#171717]">{t.name}</CardTitle>
                   <Badge className={statusColor[t.status] || ""}>
                     {statusLabel[t.status] || t.status}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="flex items-center gap-4 text-sm text-slate-500">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Users className="h-3.5 w-3.5" />
                     {t.player_count}/{t.max_players}
@@ -152,7 +152,7 @@ export function Tournaments() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-slate-400 hover:text-red-500"
+                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(t.id);
@@ -169,7 +169,7 @@ export function Tournaments() {
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5" />
@@ -179,24 +179,26 @@ export function Tournaments() {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium text-slate-700">Nama Cup</label>
+              <label className="text-sm font-bold text-[#171717]">Nama Cup</label>
               <Input
                 placeholder="Contoh: Cup Putaran 1"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700">Max Peserta</label>
+              <label className="text-sm font-bold text-[#171717]">Max Peserta</label>
               <Input
                 type="number"
                 min={2}
                 max={64}
                 value={newMax}
                 onChange={(e) => setNewMax(e.target.value)}
+                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
-              <p className="text-xs text-slate-400 mt-1">Gunakan kelipatan 2 untuk bracket rapi (2, 4, 8, 16, 32)</p>
+              <p className="text-xs text-muted-foreground mt-1">Gunakan kelipatan 2 untuk bracket rapi (2, 4, 8, 16, 32)</p>
             </div>
             <div className="flex gap-2 pt-2">
               <Button onClick={handleCreate} disabled={creating} className="flex-1">

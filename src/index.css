@@ -51,85 +51,99 @@
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Playful warm theme */
-  --background: oklch(0.98 0.01 90);
-  --foreground: oklch(0.25 0.02 280);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.02 280);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.02 280);
+  /* Neo-Brutalist Colorful — Light Mode */
+  --background: #fffbeb;
+  --foreground: #171717;
 
-  /* Coral/Vermilion primary */
-  --primary: oklch(0.58 0.2 20);
-  --primary-foreground: oklch(1 0 0);
+  --card: #ffffff;
+  --card-foreground: #171717;
 
-  /* Teal secondary */
-  --secondary: oklch(0.72 0.12 180);
-  --secondary-foreground: oklch(1 0 0);
+  --popover: #ffffff;
+  --popover-foreground: #171717;
 
-  --muted: oklch(0.96 0.01 90);
-  --muted-foreground: oklch(0.5 0.02 280);
+  /* Bold Indigo Primary */
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
 
-  /* Yellow accent */
-  --accent: oklch(0.85 0.14 85);
-  --accent-foreground: oklch(0.3 0.05 60);
+  /* Bold Amber Secondary */
+  --secondary: #fbbf24;
+  --secondary-foreground: #171717;
 
-  --destructive: oklch(0.55 0.22 20);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.02 280);
-  --input: oklch(0.9 0.02 280);
-  --ring: oklch(0.58 0.2 20);
+  --muted: #e5e7eb;
+  --muted-foreground: #525252;
 
-  /* Chart colors — bright and distinct */
-  --chart-1: oklch(0.58 0.2 20);
-  --chart-2: oklch(0.72 0.12 180);
-  --chart-3: oklch(0.85 0.14 85);
-  --chart-4: oklch(0.62 0.16 320);
-  --chart-5: oklch(0.65 0.17 260);
+  /* Playful Pink Accent */
+  --accent: #ec4899;
+  --accent-foreground: #ffffff;
 
-  --sidebar: oklch(0.98 0.01 90);
-  --sidebar-foreground: oklch(0.25 0.02 280);
-  --sidebar-primary: oklch(0.58 0.2 20);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.85 0.14 85);
-  --sidebar-accent-foreground: oklch(0.3 0.05 60);
-  --sidebar-border: oklch(0.9 0.02 280);
-  --sidebar-ring: oklch(0.58 0.2 20);
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Thick dark borders — Brutalism signature */
+  --border: #171717;
+  --input: #171717;
+  --ring: #4f46e5;
+
+  /* Chart colors — bright & distinct for kids */
+  --chart-1: #4f46e5;
+  --chart-2: #fbbf24;
+  --chart-3: #ec4899;
+  --chart-4: #10b981;
+  --chart-5: #f97316;
+
+  --sidebar: #fffbeb;
+  --sidebar-foreground: #171717;
+  --sidebar-primary: #4f46e5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fbbf24;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #171717;
+  --sidebar-ring: #4f46e5;
 }
 
 .dark {
-  --background: oklch(0.17 0.02 280);
-  --foreground: oklch(0.95 0.01 90);
-  --card: oklch(0.22 0.02 280);
-  --card-foreground: oklch(0.95 0.01 90);
-  --popover: oklch(0.22 0.02 280);
-  --popover-foreground: oklch(0.95 0.01 90);
-  --primary: oklch(0.62 0.2 20);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.72 0.12 180);
-  --secondary-foreground: oklch(0.15 0.02 280);
-  --muted: oklch(0.28 0.02 280);
-  --muted-foreground: oklch(0.6 0.02 280);
-  --accent: oklch(0.85 0.14 85);
-  --accent-foreground: oklch(0.15 0.02 280);
-  --destructive: oklch(0.55 0.22 20);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.3 0.02 280);
-  --input: oklch(0.3 0.02 280);
-  --ring: oklch(0.62 0.2 20);
-  --chart-1: oklch(0.62 0.2 20);
-  --chart-2: oklch(0.72 0.12 180);
-  --chart-3: oklch(0.85 0.14 85);
-  --chart-4: oklch(0.66 0.16 320);
-  --chart-5: oklch(0.69 0.17 260);
-  --sidebar: oklch(0.22 0.02 280);
-  --sidebar-foreground: oklch(0.95 0.01 90);
-  --sidebar-primary: oklch(0.62 0.2 20);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.28 0.02 280);
-  --sidebar-accent-foreground: oklch(0.95 0.01 90);
-  --sidebar-border: oklch(0.3 0.02 280);
-  --sidebar-ring: oklch(0.62 0.2 20);
+  --background: #171717;
+  --foreground: #fafafa;
+
+  --card: #262626;
+  --card-foreground: #fafafa;
+
+  --popover: #262626;
+  --popover-foreground: #fafafa;
+
+  --primary: #818cf8;
+  --primary-foreground: #171717;
+
+  --secondary: #fbbf24;
+  --secondary-foreground: #171717;
+
+  --muted: #404040;
+  --muted-foreground: #a3a3a3;
+
+  --accent: #f472b6;
+  --accent-foreground: #171717;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #525252;
+  --input: #525252;
+  --ring: #818cf8;
+
+  --chart-1: #818cf8;
+  --chart-2: #fbbf24;
+  --chart-3: #f472b6;
+  --chart-4: #34d399;
+  --chart-5: #fb923c;
+
+  --sidebar: #171717;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #818cf8;
+  --sidebar-primary-foreground: #171717;
+  --sidebar-accent: #fbbf24;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #525252;
+  --sidebar-ring: #818cf8;
 }
 
 @layer base {
@@ -144,12 +158,75 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: "Fredoka", var(--font-sans);
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 
-/* ===== ARCADE STYLES ===== */
+/* ===== NEO-BRUTALIST UTILITIES ===== */
+
+@utility brutal-shadow {
+  box-shadow: 4px 4px 0 0 #171717;
+}
+
+@utility brutal-shadow-sm {
+  box-shadow: 2px 2px 0 0 #171717;
+}
+
+@utility brutal-shadow-lg {
+  box-shadow: 6px 6px 0 0 #171717;
+}
+
+@utility brutal-shadow-hover {
+  box-shadow: 6px 6px 0 0 #171717;
+}
+
+@utility brutal-card {
+  @apply rounded-xl border-2 border-[#171717] bg-card brutal-shadow transition-all;
+}
+
+@utility brutal-card-hover {
+  @apply hover:translate-x-[2px] hover:translate-y-[2px] hover:brutal-shadow-hover;
+}
+
+@utility brutal-btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#171717] px-4 py-2 text-sm font-bold transition-all;
+  box-shadow: 4px 4px 0 0 #171717;
+}
+
+@utility brutal-btn-hover {
+  @apply hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px];
+  &:hover { box-shadow: 2px 2px 0 0 #171717; }
+  &:active { box-shadow: 0 0 0 0 #171717; }
+}
+
+@utility brutal-input {
+  @apply rounded-xl border-2 border-[#171717] bg-white px-4 py-2 text-base font-medium shadow-none outline-none;
+  &:focus {
+    @apply ring-0;
+    box-shadow: 4px 4px 0 0 #171717;
+  }
+}
+
+@utility brutal-badge {
+  @apply inline-flex items-center gap-1 rounded-lg border-2 border-[#171717] px-2.5 py-1 text-xs font-bold;
+  box-shadow: 2px 2px 0 0 #171717;
+}
+
+@utility brutal-nav-item {
+  @apply flex items-center gap-2 rounded-xl border-2 border-transparent px-3.5 py-2.5 text-sm font-bold transition-all;
+  &:hover {
+    @apply border-[#171717] bg-white;
+    box-shadow: 4px 4px 0 0 #171717;
+  }
+}
+
+@utility brutal-nav-active {
+  @apply border-[#171717] bg-white;
+  box-shadow: 4px 4px 0 0 #171717;
+}
+
+/* ===== LEGACY ANIMATIONS (keep for compatibility) ===== */
 
 @utility arcade-glow {
   box-shadow: 0 0 20px rgba(255, 107, 107, 0.3), 0 0 60px rgba(255, 107, 107, 0.1);

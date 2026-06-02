@@ -5,7 +5,7 @@ export function StatusBanner({ isOnline }) {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md",
+        "flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
         isOnline
           ? "bg-green-100 text-green-800"
           : "bg-red-100 text-red-800"

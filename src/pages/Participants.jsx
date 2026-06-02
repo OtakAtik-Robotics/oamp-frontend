@@ -161,11 +161,11 @@ export function Participants() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Daftar Peserta</h1>
-          <p className="text-sm text-slate-500">Peserta terdaftar dan hasil assessment</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Daftar Peserta</h1>
+          <p className="text-sm text-muted-foreground">Peserta terdaftar dan hasil assessment</p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="secondary" className="text-sm px-3 py-1.5 gap-1.5">
+          <Badge variant="secondary" className="text-sm px-3 py-1.5 gap-1.5 border-2 border-[#171717]">
             <Users className="h-3.5 w-3.5" />
             {participants.length} peserta
           </Badge>
@@ -204,17 +204,17 @@ export function Participants() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Cari nama, UID, atau kelas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-white"
+            className="pl-9 bg-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
           />
         </div>
         <Select value={selectedBatch} onValueChange={setSelectedBatch}>
-          <SelectTrigger className="w-[200px] bg-white">
-            <Filter className="h-4 w-4 mr-2 text-slate-400" />
+          <SelectTrigger className="w-[200px] bg-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl">
+            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
             <SelectValue placeholder="Semua Sesi" />
           </SelectTrigger>
           <SelectContent>
@@ -229,27 +229,27 @@ export function Participants() {
         </Select>
       </div>
 
-      <Card className="border border-slate-200 shadow-sm">
-        <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-          <CardTitle className="text-slate-800 text-base font-semibold">Direktori Peserta</CardTitle>
+      <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+        <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
+          <CardTitle className="text-[#171717] text-base font-bold">Direktori Peserta</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : isError ? (
-            <div className="text-center py-12 text-slate-400">
-              <Users className="h-10 w-10 mx-auto mb-3 text-slate-300" />
+            <div className="text-center py-12 text-muted-foreground">
+              <Users className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
               <p className="text-red-500 font-medium">Gagal memuat data peserta.</p>
             </div>
           ) : participants.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <Users className="h-10 w-10 mx-auto mb-3 text-slate-300" />
+            <div className="text-center py-12 text-muted-foreground">
+              <Users className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
               <p>Belum ada peserta terdaftar.</p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-muted-foreground">
               <p>
                 Tidak ada peserta yang cocok dengan &quot;{search}&quot;.
               </p>
@@ -274,10 +274,10 @@ export function Participants() {
                   {filtered.map((p) => (
                     <TableRow
                       key={p.id}
-                      className="cursor-pointer group transition-all hover:bg-slate-50"
+                      className="cursor-pointer group transition-all hover:bg-[#f3f4f6]"
                       onClick={() => navigate(`/analytics/${p.uid}`)}
                     >
-                      <TableCell className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                      <TableCell className="font-bold text-[#171717] group-hover:text-blue-600 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
                             {p.name?.charAt(0)?.toUpperCase()}
@@ -286,33 +286,33 @@ export function Participants() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono text-slate-600">
+                        <code className="text-xs bg-[#f3f4f6] px-1.5 py-0.5 rounded font-mono text-muted-foreground">
                           {p.uid}
                         </code>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-semibold text-xs">
+                        <Badge variant="outline" className="font-bold text-xs border-2 border-[#171717]">
                           {p.grade}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-center text-slate-500">{p.age}</TableCell>
-                      <TableCell className="text-center capitalize text-slate-500">
+                      <TableCell className="text-center text-muted-foreground">{p.age}</TableCell>
+                      <TableCell className="text-center capitalize text-muted-foreground">
                         {p.gender || "—"}
                       </TableCell>
                       <TableCell className="text-center">
                         {p.score != null ? (
-                          <span className="font-bold text-slate-900">{p.score}</span>
+                          <span className="font-bold text-[#171717]">{p.score}</span>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-center">
                         {p.level_reached != null ? (
-                          <span className="inline-flex items-center justify-center rounded-full w-7 h-7 bg-slate-100 text-sm font-bold text-slate-700">
+                          <span className="inline-flex items-center justify-center rounded-full w-7 h-7 bg-[#f3f4f6] text-sm font-bold text-[#171717]">
                             {p.level_reached}
                           </span>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-center">
@@ -320,7 +320,7 @@ export function Participants() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-blue-600"
+                            className="h-8 w-8 text-muted-foreground hover:text-blue-600"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/analytics/${p.uid}`);
@@ -331,7 +331,7 @@ export function Participants() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-red-500"
+                            className="h-8 w-8 text-muted-foreground hover:text-red-500"
                             disabled={downloadingRapor[p.uid]}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -348,7 +348,7 @@ export function Participants() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-red-500"
+                              className="h-8 w-8 text-muted-foreground hover:text-red-500"
                               disabled={deleting[p.id]}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -364,7 +364,7 @@ export function Participants() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-slate-500 text-sm">
+                      <TableCell className="text-muted-foreground text-sm">
                         {p.created_at
                           ? new Date(p.created_at).toLocaleDateString("id-ID", {
                               day: "numeric",
@@ -387,7 +387,7 @@ export function Participants() {
   function SortTh({ field, children, className }) {
     return (
       <TableHead
-        className={cn("cursor-pointer select-none hover:bg-slate-100 text-slate-500 text-xs uppercase tracking-wider", className)}
+        className={cn("cursor-pointer select-none hover:bg-[#f3f4f6] text-muted-foreground text-xs uppercase tracking-wider", className)}
         onClick={() => toggleSort(field)}
       >
         <span className="flex items-center gap-1">
@@ -412,10 +412,10 @@ const statColors = {
 
 function StatMini({ icon, label, value, color }) {
   return (
-    <div className={cn("flex items-center gap-3 rounded-xl border p-4", statColors[color])}>
-      <div className="p-2 rounded-lg bg-white">{icon}</div>
+    <div className={cn("flex items-center gap-3 rounded-xl border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] p-4", statColors[color])}>
+      <div className="p-2 rounded-lg bg-white shadow-[2px_2px_0_0_#171717]">{icon}</div>
       <div>
-        <p className="text-xs font-medium opacity-70 uppercase tracking-wide">{label}</p>
+        <p className="text-xs font-bold opacity-70 uppercase tracking-wide">{label}</p>
         <p className="text-lg font-bold">{value}</p>
       </div>
     </div>
