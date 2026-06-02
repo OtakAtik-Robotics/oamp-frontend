@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 import api from "@/lib/axios";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,6 +99,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export function Dashboard() {
   const queryClient = useQueryClient();
+  const { adminMode } = useAdminMode();
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [newSessionName, setNewSessionName] = useState("");
   const [startingSession, setStartingSession] = useState(false);
@@ -601,34 +603,36 @@ export function Dashboard() {
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      {deleteConfirmId === batch.id ? (
-                        <div className="flex items-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="h-7 text-xs px-2"
-                            onClick={() => handleDeleteBatch(batch.id)}
-                          >
-                            Yakin?
-                          </Button>
+                      {adminMode && (
+                        deleteConfirmId === batch.id ? (
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 text-xs px-2"
+                              onClick={() => handleDeleteBatch(batch.id)}
+                            >
+                              Yakin?
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 text-xs px-2"
+                              onClick={() => setDeleteConfirmId(null)}
+                            >
+                              Batal
+                            </Button>
+                          </div>
+                        ) : (
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-7 text-xs px-2"
-                            onClick={() => setDeleteConfirmId(null)}
+                            className="h-7 px-1.5 text-red-500 hover:text-red-600"
+                            onClick={() => setDeleteConfirmId(batch.id)}
                           >
-                            Batal
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 px-1.5 text-red-500 hover:text-red-600"
-                          onClick={() => setDeleteConfirmId(batch.id)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        )
                       )}
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import { toast } from "sonner";
 export function Tournaments() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { adminMode } = useAdminMode();
   const [createOpen, setCreateOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newMax, setNewMax] = useState("8");
@@ -92,10 +94,12 @@ export function Tournaments() {
           <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Turnamen Cup</h1>
           <p className="text-sm text-muted-foreground">Kelola single-elimination cup</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Buat Cup Baru
-        </Button>
+        {adminMode && (
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Buat Cup Baru
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -149,17 +153,19 @@ export function Tournaments() {
                   >
                     Lihat Bracket <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(t.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {adminMode && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(t.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
