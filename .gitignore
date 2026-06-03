@@ -27,3 +27,4 @@ dist-ssr
 # Claude Code
 .claude/
 CLAUDE.md
+AGENTS.md

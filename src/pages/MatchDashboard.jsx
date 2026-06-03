@@ -3,14 +3,23 @@ import { useMatchWebSocket } from "@/hooks/useMatchWebSocket";
 
 export function MatchDashboard() {
   const { room_id } = useParams();
-  const { players, connectionStatus, lastEvent, matchStatus } = useMatchWebSocket(room_id);
+  const { players, connectionStatus, lastEvent, matchStatus, winner: wsWinner, p1Score, p2Score } = useMatchWebSocket(room_id);
 
   const winner =
-    players.P1.game_score > players.P2.game_score
-      ? "P1"
-      : players.P2.game_score > players.P1.game_score
-        ? "P2"
-        : "DRAW";
+    wsWinner === "draw"
+      ? "DRAW"
+      : wsWinner === "1"
+        ? "P1"
+        : wsWinner === "2"
+          ? "P2"
+          : p1Score > p2Score
+            ? "P1"
+            : p2Score > p1Score
+              ? "P2"
+              : "DRAW";
+
+  const finalP1Score = p1Score ?? players.P1.game_score;
+  const finalP2Score = p2Score ?? players.P2.game_score;
 
   const connDot =
     connectionStatus === "connected"
@@ -26,6 +35,9 @@ export function MatchDashboard() {
         ? "Connecting..."
         : "Disconnected";
 
+  const p1Name = players.P1.player_name || "Player 1";
+  const p2Name = players.P2.player_name || "Player 2";
+
   return (
     <div className="min-h-screen bg-[#f3f4f6] text-[#171717] flex flex-col relative">
       {/* HEADER */}
@@ -40,24 +52,33 @@ export function MatchDashboard() {
         </div>
 
         <div className="flex items-center gap-1.5 bg-blue-50 border-2 border-[#171717] px-2.5 py-1 rounded-full text-[11px] font-bold tracking-widest text-blue-700 shadow-[2px_2px_0_0_#171717]">
-          <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-          LIVE
+          <div className={`w-1.5 h-1.5 rounded-full ${matchStatus === "playing" ? "bg-emerald-500 animate-pulse" : "bg-blue-600"}`} />
+          {matchStatus === "playing" ? "LIVE" : matchStatus === "finished" ? "SELESAI" : "MENUNGGU"}
         </div>
 
-        <div className="text-[13px] text-muted-foreground tracking-wider">
-          Room: {room_id}
+        <div className="flex items-center gap-3">
+          <div className="text-[13px] text-muted-foreground tracking-wider">
+            Room: {room_id}
+          </div>
+          <span className={`w-2 h-2 rounded-full ${connDot}`} />
+          <span className="text-[11px] font-bold tracking-wider text-[#171717]">
+            {connLabel}
+          </span>
         </div>
       </div>
 
       {/* ARENA */}
       <div className="flex-1 flex min-h-0">
         {/* PLAYER 1 */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8 border-r-2 border-[#171717]">
+        <div className={`flex-1 flex flex-col items-center justify-center gap-4 p-8 border-r-2 border-[#171717] ${winner === "P1" ? "bg-emerald-50/50" : ""}`}>
           <div className="text-sm tracking-widest text-muted-foreground uppercase font-bold">
             P1
           </div>
+          <div className="text-lg font-bold text-[#171717]">
+            {p1Name}
+          </div>
 
-          <div className="text-[120px] leading-none tracking-wider text-[#171717] font-black">
+          <div className={`text-[120px] leading-none tracking-wider font-black ${winner === "P1" ? "text-emerald-600" : "text-[#171717]"}`}>
             {players.P1.game_score}
           </div>
 
@@ -70,7 +91,7 @@ export function MatchDashboard() {
             </span>
             <span className="flex items-center gap-1.5">
               <span
-                className={`w-2 h-2 rounded-full ${players.P1.status === "playing" ? "bg-emerald-500" : players.P1.status === "waiting" ? "bg-amber-400" : "bg-red-500"}`}
+                className={`w-2 h-2 rounded-full ${players.P1.status === "playing" ? "bg-emerald-500 animate-pulse" : players.P1.status === "waiting" ? "bg-amber-400" : players.P1.status === "finished" ? "bg-blue-500" : "bg-red-500"}`}
               />
               <span
                 className={
@@ -78,22 +99,27 @@ export function MatchDashboard() {
                     ? "text-emerald-600"
                     : players.P1.status === "waiting"
                       ? "text-amber-600"
-                      : "text-red-600"
+                      : players.P1.status === "finished"
+                        ? "text-blue-600"
+                        : "text-red-600"
                 }
               >
-                {players.P1.status}
+                {players.P1.status === "finished" ? "SELESAI" : players.P1.status}
               </span>
             </span>
           </div>
         </div>
 
         {/* PLAYER 2 */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
+        <div className={`flex-1 flex flex-col items-center justify-center gap-4 p-8 ${winner === "P2" ? "bg-emerald-50/50" : ""}`}>
           <div className="text-sm tracking-widest text-muted-foreground uppercase font-bold">
             P2
           </div>
+          <div className="text-lg font-bold text-[#171717]">
+            {p2Name}
+          </div>
 
-          <div className="text-[120px] leading-none tracking-wider text-[#171717] font-black">
+          <div className={`text-[120px] leading-none tracking-wider font-black ${winner === "P2" ? "text-emerald-600" : "text-[#171717]"}`}>
             {players.P2.game_score}
           </div>
 
@@ -106,7 +132,7 @@ export function MatchDashboard() {
             </span>
             <span className="flex items-center gap-1.5">
               <span
-                className={`w-2 h-2 rounded-full ${players.P2.status === "playing" ? "bg-emerald-500" : players.P2.status === "waiting" ? "bg-amber-400" : "bg-red-500"}`}
+                className={`w-2 h-2 rounded-full ${players.P2.status === "playing" ? "bg-emerald-500 animate-pulse" : players.P2.status === "waiting" ? "bg-amber-400" : players.P2.status === "finished" ? "bg-blue-500" : "bg-red-500"}`}
               />
               <span
                 className={
@@ -114,10 +140,12 @@ export function MatchDashboard() {
                     ? "text-emerald-600"
                     : players.P2.status === "waiting"
                       ? "text-amber-600"
-                      : "text-red-600"
+                      : players.P2.status === "finished"
+                        ? "text-blue-600"
+                        : "text-red-600"
                 }
               >
-                {players.P2.status}
+                {players.P2.status === "finished" ? "SELESAI" : players.P2.status}
               </span>
             </span>
           </div>
@@ -126,37 +154,34 @@ export function MatchDashboard() {
 
       {/* FOOTER */}
       <div className="h-[40px] bg-white border-t-2 border-[#171717] flex items-center px-5 gap-2 flex-shrink-0">
-        <span className="text-[11px] text-muted-foreground tracking-wider uppercase mr-1">
-          Connection:
-        </span>
-        <span className={`w-2 h-2 rounded-full ${connDot}`} />
-        <span className="text-[11px] font-bold tracking-wider text-[#171717]">
-          {connLabel}
-        </span>
         {lastEvent && (
-          <span className="ml-auto text-[10px] text-muted-foreground tracking-wider">
-            last event: {lastEvent.type}
+          <span className="text-[10px] text-muted-foreground tracking-wider">
+            {lastEvent.type}
           </span>
         )}
       </div>
 
       {/* GAME OVER OVERLAY */}
       {matchStatus === "finished" && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#171717]/70">
-          <div className="text-6xl mb-4">👑</div>
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#171717]/80 backdrop-blur-sm">
+          <div className="text-7xl mb-4">
+            {winner === "DRAW" ? "🤝" : "👑"}
+          </div>
           <div className="text-7xl font-black leading-none tracking-wide text-white">
-            {winner === "DRAW" ? "DRAW" : `${winner} WINS`}
+            {winner === "DRAW" ? "SERI!" : `${winner} MENANG!`}
           </div>
           <div className="mt-3 text-sm tracking-widest text-white/70 uppercase">
-            Match Finished
+            Pertandingan Selesai
           </div>
           <div className="mt-6 flex items-center gap-8 text-4xl font-black tracking-wide text-white">
-            <span className={winner === "P1" ? "text-blue-400" : "text-white/50"}>
-              {players.P1.game_score}
+            <span className={`flex flex-col items-center ${winner === "P1" ? "text-emerald-400" : "text-white/50"}`}>
+              <span className="text-sm font-normal tracking-wider mb-1">{p1Name}</span>
+              {finalP1Score}
             </span>
-            <span className="text-white/30">-</span>
-            <span className={winner === "P2" ? "text-blue-400" : "text-white/50"}>
-              {players.P2.game_score}
+            <span className="text-white/30 text-2xl">vs</span>
+            <span className={`flex flex-col items-center ${winner === "P2" ? "text-emerald-400" : "text-white/50"}`}>
+              <span className="text-sm font-normal tracking-wider mb-1">{p2Name}</span>
+              {finalP2Score}
             </span>
           </div>
         </div>

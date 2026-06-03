@@ -119,7 +119,7 @@ export function Register() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="uid">Barcode *</Label>
+              <Label htmlFor="uid">ID Peserta *</Label>
               <Input
                 id="uid"
                 name="uid"
@@ -127,13 +127,13 @@ export function Register() {
                 value={form.uid}
                 onChange={handleChange}
                 onKeyDown={handleUidScan}
-                placeholder="Scan barcode..."
+                placeholder="Masukkan ID peserta..."
                 required
                 autoFocus
                 className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
               <p className="text-xs text-muted-foreground">
-                Scanner barcode otomatis terdeteksi. Arahkan scanner ke field ini.
+                Ketik atau scan ID peserta. Field ini otomatis aktif.
               </p>
             </div>
 
