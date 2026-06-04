@@ -229,7 +229,11 @@ export function Analytics() {
   const totalSessions = sessions?.length || 0;
 
   function getSessionScore(s) {
-    return s.score ?? (s.visuo_spatial_fit != null ? Math.round(s.visuo_spatial_fit * 100) : null);
+    if (s.score != null) return s.score;
+    if (s.visuo_spatial_fit != null && s.level_reached != null) {
+      return Math.round(s.level_reached * 10 + s.visuo_spatial_fit * 50 + (s.dexterity_score || 0) * 0.2);
+    }
+    return null;
   }
 
   const bestScore =
