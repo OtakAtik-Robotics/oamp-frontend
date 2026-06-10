@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import api from "@/lib/axios";
@@ -51,10 +51,9 @@ export function Analytics() {
   const [aiPaymentRequired, setAiPaymentRequired] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
-  const snapScriptInjected = useRef(false);
 
   useEffect(() => {
-    if (snapScriptInjected.current) return;
+    if (document.querySelector('script[src*="snap.js"]')) return;
     const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
     if (!clientKey) return;
     const script = document.createElement("script");
@@ -62,7 +61,6 @@ export function Analytics() {
     script.setAttribute("data-client-key", clientKey);
     script.async = true;
     document.body.appendChild(script);
-    snapScriptInjected.current = true;
   }, []);
 
   async function handleDownloadRapor() {

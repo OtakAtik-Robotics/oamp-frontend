@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,21 @@ export function Register() {
   const [loading, setLoading] = useState(false);
   const uidRef = useRef(null);
 
+  const { data: batchesRes } = useQuery({
+    queryKey: ["batches"],
+    queryFn: () => api.get("/batches"),
+  });
+
+  const activeBatch = useMemo(() => {
+    const list = batchesRes?.data?.data || batchesRes?.data || [];
+    return list.find((b) => b.is_active) || null;
+  }, [batchesRes]);
+
+  const hasUidPrefix = activeBatch?.uid_prefix;
+  const autoUidHint = hasUidPrefix
+    ? `${activeBatch.uid_prefix}${String(activeBatch.uid_counter + 1).padStart(3, "0")}`
+    : "";
+
   useEffect(() => {
     uidRef.current?.focus();
   }, []);
@@ -74,7 +89,7 @@ export function Register() {
     setLoading(true);
 
     const payload = {
-      uid: form.uid.trim(),
+      uid: form.uid.trim() || undefined,
       name: form.name.trim(),
       age: parseInt(form.age),
       grade: form.grade,
@@ -119,7 +134,7 @@ export function Register() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="uid">ID Peserta *</Label>
+              <Label htmlFor="uid">ID Peserta {!hasUidPrefix && "*"}</Label>
               <Input
                 id="uid"
                 name="uid"
@@ -127,14 +142,20 @@ export function Register() {
                 value={form.uid}
                 onChange={handleChange}
                 onKeyDown={handleUidScan}
-                placeholder="Masukkan ID peserta..."
-                required
+                placeholder={hasUidPrefix ? `${autoUidHint} — kosongkan untuk auto` : "Masukkan ID peserta..."}
+                required={!hasUidPrefix}
                 autoFocus
                 className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
-              <p className="text-xs text-muted-foreground">
-                Ketik atau scan ID peserta. Field ini otomatis aktif.
-              </p>
+              {hasUidPrefix ? (
+                <p className="text-xs text-muted-foreground">
+                  Kosongkan untuk auto-generate <strong>{autoUidHint}</strong>. Ketik manual untuk koreksi.
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Ketik atau scan ID peserta. Field ini otomatis aktif.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -158,10 +179,10 @@ export function Register() {
                   name="age"
                   type="number"
                   min={3}
-                  max={99}
+                  max={150}
                   value={form.age}
                   onChange={handleChange}
-                placeholder="3-99"
+                placeholder="3-150"
                 required
                 className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
@@ -216,10 +237,11 @@ export function Register() {
                   name="height"
                   type="number"
                   min={50}
+                  max={300}
                   step={0.1}
                   value={form.height}
                   onChange={handleChange}
-                placeholder="Tinggi badan"
+                placeholder="50-300"
                 required
                 className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
@@ -231,10 +253,11 @@ export function Register() {
                   name="weight"
                   type="number"
                   min={5}
+                  max={500}
                   step={0.1}
                   value={form.weight}
                   onChange={handleChange}
-                placeholder="Berat badan"
+                placeholder="5-500"
                 required
                 className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
               />
@@ -277,6 +300,7 @@ export function Register() {
                   name="grip_strength"
                   type="number"
                   min={0}
+                  max={200}
                   step={0.1}
                   value={form.grip_strength}
                   onChange={handleChange}

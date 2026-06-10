@@ -13,8 +13,8 @@ export function AdminModeProvider({ children }) {
   const [showPinDialog, setShowPinDialog] = useState(false);
 
   const attemptActivate = useCallback((pin) => {
-    // Hardcoded PIN for local event — keep simple, no env needed
-    if (pin === "7890") {
+    const expected = import.meta.env.VITE_ADMIN_PIN || "7890";
+    if (pin === expected) {
       setAdminMode(true);
       setShowPinDialog(false);
       return true;

@@ -102,6 +102,7 @@ export function Dashboard() {
   const { adminMode } = useAdminMode();
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [newSessionName, setNewSessionName] = useState("");
+  const [newSessionPrefix, setNewSessionPrefix] = useState("");
   const [startingSession, setStartingSession] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState("all");
   const [editingBatchId, setEditingBatchId] = useState(null);
@@ -163,9 +164,13 @@ export function Dashboard() {
     }
     setStartingSession(true);
     try {
-      await api.post("/batches", { name: newSessionName.trim() });
+      await api.post("/batches", {
+        name: newSessionName.trim(),
+        uid_prefix: newSessionPrefix.trim() || undefined,
+      });
       toast.success(`Sesi "${newSessionName.trim()}" berhasil dimulai!`);
       setNewSessionName("");
+      setNewSessionPrefix("");
       setSessionDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["batches"] });
       await Promise.all([refetchBoard(), refetchTimeline()]);
@@ -652,6 +657,16 @@ export function Dashboard() {
                 if (e.key === "Enter") handleStartNewSession();
               }}
             />
+            <Input
+              placeholder="Prefiks ID (opsional): BDT"
+              value={newSessionPrefix}
+              onChange={(e) => setNewSessionPrefix(e.target.value)}
+              maxLength={10}
+              className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+            />
+            <p className="text-xs text-muted-foreground">
+              ID peserta akan dibuat otomatis: {newSessionPrefix || "BDT"}001, {newSessionPrefix || "BDT"}002, dst.
+            </p>
             <div className="flex gap-2">
               <Button
                 onClick={handleStartNewSession}

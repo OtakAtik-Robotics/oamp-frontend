@@ -15,6 +15,7 @@ import { MatchDashboard } from "@/pages/MatchDashboard";
 import { Tournaments } from "@/pages/Tournaments";
 import { TournamentDetail } from "@/pages/TournamentDetail";
 import { Admin } from "@/pages/Admin";
+import { EventDisplay } from "@/pages/EventDisplay";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,7 @@ function App() {
                 <Route path="/tournament/:id" element={<TournamentDetail />} />
               </Route>
               <Route path="/match/:room_id" element={<MatchDashboard />} />
+              <Route path="/event" element={<EventDisplay />} />
             </Routes>
           </BrowserRouter>
           <Toaster richColors position="top-right" />

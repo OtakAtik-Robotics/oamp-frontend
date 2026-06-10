@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
@@ -19,11 +19,10 @@ export function Paywall() {
   const { uid } = useParams();
   const [paid, setPaid] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const snapInjected = useRef(false);
 
-  // Inject Midtrans Snap
+  // Inject Midtrans Snap (once globally)
   useEffect(() => {
-    if (snapInjected.current) return;
+    if (document.querySelector('script[src*="snap.js"]')) return;
     const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
     if (!clientKey) return;
     const script = document.createElement("script");
@@ -31,7 +30,6 @@ export function Paywall() {
     script.setAttribute("data-client-key", clientKey);
     script.async = true;
     document.body.appendChild(script);
-    snapInjected.current = true;
   }, []);
 
   const { data: participant, isLoading, isError } = useQuery({
