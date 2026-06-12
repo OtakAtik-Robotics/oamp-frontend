@@ -12,9 +12,9 @@ export function MatchDashboard() {
         ? "P1"
         : wsWinner === "2"
           ? "P2"
-          : p1Score > p2Score
+          : p1Score < p2Score
             ? "P1"
-            : p2Score > p1Score
+            : p2Score < p1Score
               ? "P2"
               : "DRAW";
 
@@ -39,19 +39,19 @@ export function MatchDashboard() {
   const p2Name = players.P2.player_name || "Player 2";
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] text-[#171717] flex flex-col relative">
+    <div className="min-h-screen bg-muted text-foreground flex flex-col relative">
       {/* HEADER */}
-      <div className="h-[52px] bg-white border-b-2 border-[#171717] flex items-center justify-between px-5 flex-shrink-0">
+      <div className="h-[52px] bg-card border-b border-border flex items-center justify-between px-5 flex-shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-base">
             🏆
           </div>
-          <div className="font-bold text-lg tracking-tight text-[#171717]">
+          <div className="font-bold text-lg tracking-tight text-foreground">
             OAMP <span className="text-muted-foreground font-normal text-sm ml-1">Spectator</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-blue-50 border-2 border-[#171717] px-2.5 py-1 rounded-full text-[11px] font-bold tracking-widest text-blue-700 shadow-[2px_2px_0_0_#171717]">
+        <div className="flex items-center gap-1.5 bg-blue-50 border border-border px-2.5 py-1 rounded-full text-[11px] font-bold tracking-widest text-blue-700 shadow-sm">
           <div className={`w-1.5 h-1.5 rounded-full ${matchStatus === "playing" ? "bg-emerald-500 animate-pulse" : "bg-blue-600"}`} />
           {matchStatus === "playing" ? "LIVE" : matchStatus === "finished" ? "SELESAI" : "MENUNGGU"}
         </div>
@@ -61,7 +61,7 @@ export function MatchDashboard() {
             Room: {room_id}
           </div>
           <span className={`w-2 h-2 rounded-full ${connDot}`} />
-          <span className="text-[11px] font-bold tracking-wider text-[#171717]">
+          <span className="text-[11px] font-bold tracking-wider text-foreground">
             {connLabel}
           </span>
         </div>
@@ -70,22 +70,22 @@ export function MatchDashboard() {
       {/* ARENA */}
       <div className="flex-1 flex min-h-0">
         {/* PLAYER 1 */}
-        <div className={`flex-1 flex flex-col items-center justify-center gap-4 p-8 border-r-2 border-[#171717] ${winner === "P1" ? "bg-emerald-50/50" : ""}`}>
+        <div className={`flex-1 flex flex-col items-center justify-center gap-4 p-8 border-r-2 border-border ${winner === "P1" ? "bg-emerald-50/50" : ""}`}>
           <div className="text-sm tracking-widest text-muted-foreground uppercase font-bold">
             P1
           </div>
-          <div className="text-lg font-bold text-[#171717]">
+          <div className="text-lg font-bold text-foreground">
             {p1Name}
           </div>
 
-          <div className={`text-[120px] leading-none tracking-wider font-black ${winner === "P1" ? "text-emerald-600" : "text-[#171717]"}`}>
+          <div className={`text-[120px] leading-none tracking-wider font-black ${winner === "P1" ? "text-emerald-600" : "text-foreground"}`}>
             {players.P1.game_score}
           </div>
 
           <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
             <span>
               Blocks Hit:{" "}
-              <span className="text-[#171717] font-bold">
+              <span className="text-foreground font-bold">
                 {players.P1.blocks_hit}
               </span>
             </span>
@@ -115,18 +115,18 @@ export function MatchDashboard() {
           <div className="text-sm tracking-widest text-muted-foreground uppercase font-bold">
             P2
           </div>
-          <div className="text-lg font-bold text-[#171717]">
+          <div className="text-lg font-bold text-foreground">
             {p2Name}
           </div>
 
-          <div className={`text-[120px] leading-none tracking-wider font-black ${winner === "P2" ? "text-emerald-600" : "text-[#171717]"}`}>
+          <div className={`text-[120px] leading-none tracking-wider font-black ${winner === "P2" ? "text-emerald-600" : "text-foreground"}`}>
             {players.P2.game_score}
           </div>
 
           <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
             <span>
               Blocks Hit:{" "}
-              <span className="text-[#171717] font-bold">
+              <span className="text-foreground font-bold">
                 {players.P2.blocks_hit}
               </span>
             </span>
@@ -153,7 +153,7 @@ export function MatchDashboard() {
       </div>
 
       {/* FOOTER */}
-      <div className="h-[40px] bg-white border-t-2 border-[#171717] flex items-center px-5 gap-2 flex-shrink-0">
+      <div className="h-[40px] bg-card border-t border-border flex items-center px-5 gap-2 flex-shrink-0">
         {lastEvent && (
           <span className="text-[10px] text-muted-foreground tracking-wider">
             {lastEvent.type}
@@ -163,7 +163,7 @@ export function MatchDashboard() {
 
       {/* GAME OVER OVERLAY */}
       {matchStatus === "finished" && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#171717]/80 backdrop-blur-sm">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-foreground/80 backdrop-blur-sm">
           <div className="text-7xl mb-4">
             {winner === "DRAW" ? "🤝" : "👑"}
           </div>

@@ -79,7 +79,6 @@ Register a new participant at the registration station.
   "height": 135.5,
   "weight": 30.2,
   "heart_rate": 85,
-  "spo2": 98.5,
   "grip_strength": 12.3
 }
 ```
@@ -95,7 +94,6 @@ Register a new participant at the registration station.
 | `height` | required, > 0 |
 | `weight` | required, > 0 |
 | `heart_rate` | optional, 40-220 |
-| `spo2` | optional, 0-100 |
 | `grip_strength` | optional, >= 0 |
 
 **Response `201`:**
@@ -113,7 +111,6 @@ Register a new participant at the registration station.
     "height": 135.5,
     "weight": 30.2,
     "heart_rate": 85,
-    "spo2": 98.5,
     "grip_strength": 12.3,
     "created_at": "2026-04-12T10:00:00Z"
   }
@@ -256,7 +253,6 @@ Returns `height` so the robot can adjust its actuator.
     "height": 135.5,
     "weight": 30.2,
     "heart_rate": 85,
-    "spo2": 98.5,
     "grip_strength": 12.3,
     "created_at": "2026-04-12T10:00:00Z"
   }
@@ -287,9 +283,8 @@ Uses a database transaction to atomically create the session, face expression lo
     "mode": "normal",
     "level_reached": 6,
     "total_time": 18.5,
-    "cognitive_age": 11,
     "visuo_spatial_fit": 0.91,
-    "dexterity_score": 88.5
+    "dexterity_score": 0.0
   },
   "expressions": [
     {
@@ -319,7 +314,6 @@ Uses a database transaction to atomically create the session, face expression lo
 | `session` | `mode` | no | Game mode (e.g. "normal") |
 | `session` | `level_reached` | no | Highest level completed |
 | `session` | `total_time` | no | Total play time in seconds |
-| `session` | `cognitive_age` | no | Estimated cognitive age |
 | `session` | `visuo_spatial_fit` | no | Visuo-spatial fitness score (0-1) |
 | `session` | `dexterity_score` | no | Dexterity score |
 | `expressions` | `level` | no | Game level when emotion was recorded |
@@ -427,7 +421,6 @@ Login for the Android app. Returns participant data and all their game sessions.
       "height": 135.5,
       "weight": 30.2,
       "heart_rate": 85,
-      "spo2": 98.5,
       "grip_strength": 12.3,
       "created_at": "2026-04-12T10:00:00Z"
     },
@@ -438,9 +431,8 @@ Login for the Android app. Returns participant data and all their game sessions.
         "mode": "normal",
         "level_reached": 6,
         "total_time": 18.5,
-        "cognitive_age": 11,
         "visuo_spatial_fit": 0.91,
-        "dexterity_score": 88.5,
+        "dexterity_score": 0.0,
         "created_at": "2026-04-12T10:10:00Z"
       }
     ]
@@ -494,16 +486,16 @@ One entry per participant (uses PostgreSQL `DISTINCT ON`).
 
 **Score formula:**
 ```
-score = (level_reached × 10) + (visuo_spatial_fit × 50) + (dexterity_score × 0.2)
+score = (level_reached × 1000) - (total_time × 10)
 ```
 
 | Metric | Weight | Contribution |
 |--------|--------|-------------|
-| `level_reached` (1-8) | ×10 | 10 - 80 points |
-| `visuo_spatial_fit` (0-1) | ×50 | 0 - 50 points |
-| `dexterity_score` (0-100) | ×0.2 | 0 - 20 points |
+| `level_reached` (1-8) | ×1000 | 1000 - 8000 points |
+| `total_time` (seconds) | ×10 | penalty per second |
+| Score capped at | minimum | 0 |
 
-Range: 10 - 150. Always positive. Level has highest weight but doesn't dominate.
+Range: 1000 - 8000. Score = (level_reached × 1000) - (total_time × 10), capped min 0.
 
 **Response `200`:**
 ```json
@@ -522,7 +514,7 @@ Range: 10 - 150. Always positive. Level has highest weight but doesn't dominate.
       "total_time": 14.2,
       "level_reached": 8,
       "dexterity_score": 95.0,
-      "score": 145.5
+      "score": 7858
     },
     {
       "rank": 2,
@@ -535,7 +527,7 @@ Range: 10 - 150. Always positive. Level has highest weight but doesn't dominate.
       "total_time": 18.5,
       "level_reached": 6,
       "dexterity_score": 88.5,
-      "score": 108.7
+      "score": 5815
     }
   ]
 }
@@ -593,13 +585,14 @@ Each entry represents one game session (not unique per participant). The `score`
 
 ### `GET /api/v1/export/excel`
 
-Downloads an Excel (.xlsx) file with 3 sheets:
+Downloads an Excel (.xlsx) file with 4 sheets:
 
 | Sheet | Contents |
 |-------|----------|
 | Leaderboard | All ranked participants (best session per person) |
 | Participants | All registered participant data |
 | Sessions | All game session records |
+| GameResults | Per-UUID game results (task01-08, cognitive_age, visuo_spatial, variant_list, cog_age_list) |
 
 **Response:** Binary `.xlsx` file download (`Content-Disposition: attachment; filename=oamp-report.xlsx`)
 
@@ -631,7 +624,7 @@ Downloads a PDF rapor (report card) for an individual participant.
 | Section | Details |
 |---------|---------|
 | Header | "Rapor Peserta OAMP" + subtitle |
-| Data Pribadi | UID, Kelas, Umur, Jenis Kelamin, Tinggi, Berat, Detak Jantung, SpO2, Grip Strength |
+| Data Pribadi | UID, Kelas, Umur, Jenis Kelamin, Tinggi, Berat, Detak Jantung, Grip Strength |
 | Riwayat Game | Tabel semua sesi: tanggal, mode, level, waktu, VisuoSpatialFit, Dexterity |
 | Ringkasan Performa | Total sesi, skor VisuoSpatial terbaik, level tertinggi, rata-rata waktu |
 | Hasil Quiz | Tabel quiz (jika ada): tanggal, skor |
@@ -941,7 +934,7 @@ CTF-style leaderboard. Returns top participants with `ai_analysis` present.
   "status": "success",
   "message": "Ranking fetched",
   "data": [
-    { "rank": 1, "uid": "BCR-001", "name": "Dina", "age": 11, "task_avg": 0.85, "cognitive_age": 14 }
+    { "rank": 1, "uid": "BCR-001", "name": "Dina", "age": 11, "task_avg": 0.85, "score": 0 }
   ]
 }
 ```
@@ -962,7 +955,6 @@ Aggregate statistics across all participants.
     "avg_time": 0,
     "min_time": 0,
     "max_time": 0,
-    "avg_cognitive_age": 10.5,
     "avg_visuo_spatial": 0
   }
 }
@@ -1047,7 +1039,6 @@ ws://localhost:8080/ws/match/AB12?role=spectator&player_id=S1
 | `height` | float | Height in cm |
 | `weight` | float | Weight in kg |
 | `heart_rate` | int | Resting heart rate (bpm) |
-| `spo2` | float | Blood oxygen saturation (%) |
 | `grip_strength` | float | Grip strength measurement |
 | `is_premium` | bool | Premium access (default: false) |
 | `created_at` | timestamp | Auto-set by GORM |
@@ -1062,7 +1053,6 @@ ws://localhost:8080/ws/match/AB12?role=spectator&player_id=S1
 | `mode` | string | Game mode (e.g. "normal") |
 | `level_reached` | int | Highest level completed |
 | `total_time` | float | Total play time in seconds |
-| `cognitive_age` | int | Estimated cognitive age |
 | `visuo_spatial_fit` | float | Visuo-spatial fitness score |
 | `dexterity_score` | float | Dexterity score |
 | `created_at` | timestamp | Auto-set by GORM |
@@ -1510,3 +1500,76 @@ The game client maintains a local SQLite database (`local_buffer.db`) to survive
 | WS immediate hit | WS | same | `{type:"SCORE_UPDATE", game_score, blocks_hit}` |
 | WS game over | WS | same | `{type:"GAME_OVER", game_score, blocks_hit, play_duration}` |
 | WS spectator | WS | `/ws/match/{room_id}?role=spectator` | receives broadcasts |
+
+---
+
+## 16. Additional Endpoints
+
+### `GET /api/v1/participants/uid/:uid/results`
+
+Returns per-level game result data by UID. Used by Analytics per-user page.
+
+**Response `200`:**
+```json
+{
+  "status": "success",
+  "message": "Participant result fetched",
+  "data": {
+    "uid": "BCR-001",
+    "task01": 5.2, "task02": 4.1, "task03": 3.8, "task04": 5.5,
+    "task05": 6.0, "task06": 4.2, "task07": 5.1, "task08": 6.3,
+    "cognitive_age": 12,
+    "visuo_spatial": 65.0,
+    "variant_list": ["1a", "2c", "3b", "4d", "5a", "6b", "7c", "8d"],
+    "cog_age_list": [10, 11, 12, 13, 14, 15, 16, 17]
+  }
+}
+```
+
+---
+
+### `GET /api/v1/stats`
+
+Aggregate statistics. Returns total_participants, avg/min/max time, gender counts, per-level averages, timeline.
+
+---
+
+### `GET /api/v1/stations`
+
+Active station health — returns stations with recent heartbeat or game submissions.
+
+---
+
+### `GET /api/v1/export/csv`
+
+Download full data CSV export.
+
+---
+
+### `POST /api/v1/export/telegram`
+
+Send Excel report to configured Telegram chat.
+
+---
+
+### `WS /ws/event-display`
+
+WebSocket for big-screen EventDisplay. Broadcasts `score_update` and `level_start` with `completed_levels` and `is_finished` fields.
+
+---
+
+### Tournaments
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/tournaments` | List tournaments |
+| POST | `/api/v1/tournaments` | Create tournament |
+| GET | `/api/v1/tournaments/:id` | Tournament detail + bracket |
+| DELETE | `/api/v1/tournaments/:id` | Delete tournament |
+| POST | `/api/v1/tournaments/:id/join` | Join tournament |
+| POST | `/api/v1/tournaments/:id/register` | Register players |
+| POST | `/api/v1/tournaments/:id/start` | Start cup (generate bracket) |
+| GET | `/api/v1/tournaments/:id/current-match` | Get current active match |
+| POST | `/api/v1/tournaments/:id/matches/:mid/create-room` | Create room for match |
+| POST | `/api/v1/tournaments/:id/matches/:mid/result` | Submit match result |
+| GET | `/api/v1/tournaments/active-match/:uid` | Check active cup match by UID |

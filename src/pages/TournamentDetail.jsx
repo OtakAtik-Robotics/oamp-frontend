@@ -212,11 +212,11 @@ export function TournamentDetail() {
   };
 
   const statusBadge = {
-    scheduled: "bg-[#f3f4f6] text-[#171717] border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    ready: "bg-blue-100 text-blue-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    playing: "bg-amber-100 text-amber-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    finished: "bg-green-100 text-green-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    bye: "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    scheduled: "bg-muted text-foreground border border-[var(--color-border)] shadow-sm",
+    ready: "bg-blue-100 text-blue-700 border border-[var(--color-border)] shadow-sm",
+    playing: "bg-amber-100 text-amber-700 border border-[var(--color-border)] shadow-sm",
+    finished: "bg-green-100 text-green-700 border border-[var(--color-border)] shadow-sm",
+    bye: "bg-muted text-muted-foreground border border-[var(--color-border)] shadow-sm",
   };
 
   return (
@@ -228,7 +228,7 @@ export function TournamentDetail() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#171717]">{tournament.name || "Cup"}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">{tournament.name || "Cup"}</h1>
             <p className="text-sm text-muted-foreground">
               {tournament.player_count || 0}/{tournament.max_players || 0} peserta — Ronde {tournament.current_round || 0}
             </p>
@@ -248,12 +248,12 @@ export function TournamentDetail() {
             </>
           )}
           {tournament.status === "in_progress" && (
-            <Badge className="bg-green-100 text-green-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
+            <Badge className="bg-green-100 text-green-700 border border-[var(--color-border)] shadow-sm">
               <Swords className="h-3 w-3 mr-1" /> Berlangsung
             </Badge>
           )}
           {tournament.status === "finished" && (
-            <Badge className="bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
+            <Badge className="bg-muted text-muted-foreground border border-[var(--color-border)] shadow-sm">
               <CheckCircle className="h-3 w-3 mr-1" /> Selesai
             </Badge>
           )}
@@ -261,14 +261,14 @@ export function TournamentDetail() {
       </div>
 
       {/* Players */}
-      <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+      <Card className="border border-[var(--color-border)] shadow-sm rounded-xl">
         <CardContent className="p-4">
-          <h3 className="text-sm font-bold text-[#171717] mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Users className="h-4 w-4" /> Peserta ({players.length})
           </h3>
           <div className="flex flex-wrap gap-2">
             {players.map((p) => (
-              <Badge key={p.id} variant="outline" className="text-xs px-2 py-1 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
+              <Badge key={p.id} variant="outline" className="text-xs px-2 py-1 border border-[var(--color-border)] shadow-sm">
                 #{p.seed} {p.name}
               </Badge>
             ))}
@@ -309,7 +309,7 @@ export function TournamentDetail() {
                     <div key={match.id} className="relative">
                       <Card
                         className={cn(
-                          "w-56 transition-all hover:shadow-[5px_5px_0_0_#171717] border-2 border-[#171717] rounded-xl shadow-[4px_4px_0_0_#171717]",
+                          "w-56 transition-all hover:shadow-sm border border-[var(--color-border)] rounded-xl shadow-sm",
                           isReady && "bg-blue-50"
                         )}
                       >
@@ -317,7 +317,7 @@ export function TournamentDetail() {
                           {/* Player 1 */}
                           <div className={cn(
                             "flex items-center justify-between text-sm",
-                            p1Winner ? "font-bold text-[#171717]" : "text-muted-foreground",
+                            p1Winner ? "font-bold text-foreground" : "text-muted-foreground",
                             isBye && !match.player1_id && "text-muted-foreground"
                           )}>
                             <span className="truncate">{match.player1_name || "TBD"}</span>
@@ -331,7 +331,7 @@ export function TournamentDetail() {
                           {/* Player 2 */}
                           <div className={cn(
                             "flex items-center justify-between text-sm",
-                            p2Winner ? "font-bold text-[#171717]" : "text-muted-foreground",
+                            p2Winner ? "font-bold text-foreground" : "text-muted-foreground",
                             isBye && !match.player2_id && "text-muted-foreground"
                           )}>
                             <span className="truncate">{match.player2_name || "TBD"}</span>
@@ -339,7 +339,7 @@ export function TournamentDetail() {
                           {/* Room code + spectator */}
                           {match.room_id ? (
                             <div className="flex justify-center gap-2">
-                              <Badge variant="outline" className="text-[10px] font-mono border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
+                              <Badge variant="outline" className="text-[10px] font-mono border border-[var(--color-border)] shadow-sm">
                                 Room: {match.room_id}
                               </Badge>
                               <Link
@@ -402,7 +402,7 @@ export function TournamentDetail() {
                       </Card>
                       {/* Connector lines to next round */}
                       {parseInt(round) < Math.max(...roundKeys.map(Number)) && (
-                        <div className="absolute top-1/2 -right-8 w-8 h-px bg-[#171717]" />
+                        <div className="absolute top-1/2 -right-8 w-8 h-px bg-foreground" />
                       )}
                     </div>
                   );
@@ -421,7 +421,7 @@ export function TournamentDetail() {
           setSelectedUids([]);
         }
       }}>
-        <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+        <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col border border-[var(--color-border)] shadow-sm rounded-xl">
           <DialogHeader>
             <DialogTitle>Daftarkan Peserta ke Cup</DialogTitle>
             <DialogDescription>Pilih peserta dari daftar yang terdaftar.</DialogDescription>
@@ -435,7 +435,7 @@ export function TournamentDetail() {
                 placeholder="Cari nama atau UID..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="pl-9 border border-[var(--color-border)] shadow-sm rounded-xl"
               />
             </div>
 
@@ -448,7 +448,7 @@ export function TournamentDetail() {
                     <Badge
                       key={uid}
                       variant="secondary"
-                      className="cursor-pointer gap-1 pr-1.5 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]"
+                      className="cursor-pointer gap-1 pr-1.5 border border-[var(--color-border)] shadow-sm"
                       onClick={() => removeUid(uid)}
                     >
                       {p?.name || uid}
@@ -460,7 +460,7 @@ export function TournamentDetail() {
             )}
 
             {/* Participant list */}
-            <div className="flex-1 min-h-0 overflow-y-auto border-2 border-[#171717] rounded-xl bg-white shadow-[3px_3px_0_0_#171717]">
+            <div className="flex-1 min-h-0 overflow-y-auto border border-[var(--color-border)] rounded-xl bg-white shadow-sm">
               {loadingParticipants ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -472,25 +472,25 @@ export function TournamentDetail() {
                     : "Tidak ada peserta yang cocok."}
                 </div>
               ) : (
-                <div className="divide-y divide-[#171717]">
+                <div className="divide-y divide-[var(--color-border)]">
                   {filtered.map((p) => {
                     const checked = selectedUids.includes(p.uid);
                     return (
                       <label
                         key={p.id}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[#f3f4f6] transition-colors",
+                          "flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors",
                           checked && "bg-blue-50"
                         )}
                       >
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded border-2 border-[#171717] text-blue-600 focus:ring-blue-500"
+                          className="h-4 w-4 rounded border border-[var(--color-border)] text-blue-600 focus:ring-blue-500"
                           checked={checked}
                           onChange={() => toggleUid(p.uid)}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-[#171717] truncate">{p.name}</p>
+                          <p className="text-sm font-bold text-foreground truncate">{p.name}</p>
                           <p className="text-xs text-muted-foreground font-mono">{p.uid}</p>
                         </div>
                         {checked && <CheckCircle className="h-4 w-4 text-blue-600 shrink-0" />}
@@ -526,7 +526,7 @@ export function TournamentDetail() {
         setResultOpen(open);
         if (!open) setResultMatch(null);
       }}>
-        <DialogContent className="sm:max-w-sm border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+        <DialogContent className="sm:max-w-sm border border-[var(--color-border)] shadow-sm rounded-xl">
           <DialogHeader>
             <DialogTitle>Input Hasil Pertandingan</DialogTitle>
             <DialogDescription>
@@ -536,7 +536,7 @@ export function TournamentDetail() {
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-bold text-[#171717]">Skor {resultMatch?.player1_name}</label>
+                <label className="text-xs font-bold text-foreground">Skor {resultMatch?.player1_name}</label>
                 <Input
                   type="number"
                   min="0"
@@ -544,11 +544,11 @@ export function TournamentDetail() {
                   value={p1Score}
                   onChange={(e) => setP1Score(e.target.value)}
                   placeholder="0"
-                  className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                  className="border border-[var(--color-border)] shadow-sm rounded-xl"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-[#171717]">Skor {resultMatch?.player2_name}</label>
+                <label className="text-xs font-bold text-foreground">Skor {resultMatch?.player2_name}</label>
                 <Input
                   type="number"
                   min="0"
@@ -556,12 +556,12 @@ export function TournamentDetail() {
                   value={p2Score}
                   onChange={(e) => setP2Score(e.target.value)}
                   placeholder="0"
-                  className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                  className="border border-[var(--color-border)] shadow-sm rounded-xl"
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-[#171717]">Pemenang</label>
+              <label className="text-xs font-bold text-foreground">Pemenang</label>
               <div className="mt-1.5 space-y-2">
                 {resultMatch?.player1_id && (
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -573,7 +573,7 @@ export function TournamentDetail() {
                       onChange={(e) => setWinnerId(e.target.value)}
                       className="h-4 w-4 text-blue-600"
                     />
-                    <span className="text-sm text-[#171717]">{resultMatch.player1_name}</span>
+                    <span className="text-sm text-foreground">{resultMatch.player1_name}</span>
                   </label>
                 )}
                 {resultMatch?.player2_id && (
@@ -586,7 +586,7 @@ export function TournamentDetail() {
                       onChange={(e) => setWinnerId(e.target.value)}
                       className="h-4 w-4 text-blue-600"
                     />
-                    <span className="text-sm text-[#171717]">{resultMatch.player2_name}</span>
+                    <span className="text-sm text-foreground">{resultMatch.player2_name}</span>
                   </label>
                 )}
               </div>

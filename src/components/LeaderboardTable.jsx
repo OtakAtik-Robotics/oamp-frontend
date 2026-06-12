@@ -20,8 +20,8 @@ const rankConfig = {
   },
   2: {
     bg: "bg-gradient-to-r from-[#f3f4f6] via-gray-50 to-[#f3f4f6] dark:from-gray-800 dark:via-gray-800",
-    border: "border-l-4 border-l-[#171717]",
-    badge: "bg-[#d1d5db] text-[#171717]",
+    border: "border-l-4 border-l-border",
+    badge: "bg-[#d1d5db] text-foreground",
     gradient: "from-[#d1d5db] to-[#9ca3af]",
   },
   3: {
@@ -33,7 +33,8 @@ const rankConfig = {
 };
 
 function getScoreDisplay(row) {
-  return row.score ?? null;
+  const s = row.score ?? null;
+  return s != null ? Math.round(s) : null;
 }
 
 function getPointDiff(row, data, index) {
@@ -155,11 +156,11 @@ export function LeaderboardTable({ data, loading }) {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 shadow-[2px_2px_0_0_#171717]",
+                        "h-9 w-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 shadow-sm",
                         row.rank === 1
                           ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white"
                           : row.rank === 2
-                          ? "bg-gradient-to-br from-[#d1d5db] to-[#9ca3af] text-[#171717]"
+                          ? "bg-gradient-to-br from-[#d1d5db] to-[#9ca3af] text-foreground"
                           : row.rank === 3
                           ? "bg-gradient-to-br from-orange-300 to-orange-400 text-white"
                           : "bg-gradient-to-br from-violet-400 to-purple-500 text-white"
@@ -176,7 +177,7 @@ export function LeaderboardTable({ data, loading }) {
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge variant="outline" className="font-bold text-xs rounded-xl border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">
+                  <Badge variant="outline" className="font-bold text-xs rounded-xl border border-border shadow-sm">
                     {row.grade}
                   </Badge>
                 </TableCell>
@@ -227,7 +228,7 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
     },
     2: {
       bg: "from-[#d1d5db] via-[#9ca3af] to-[#6b7280]",
-      text: "text-[#171717]",
+      text: "text-foreground",
     },
     3: {
       bg: "from-orange-300 via-orange-350 to-orange-400",
@@ -246,7 +247,7 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
       <div className="relative">
         <div
           className={cn(
-            "h-16 w-16 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl font-bold text-white shadow-[3px_3px_0_0_#171717] group-hover:scale-110 transition-all duration-300",
+            "h-16 w-16 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl font-bold text-white shadow-sm group-hover:scale-110 transition-all duration-300",
             c.bg
           )}
         >
@@ -256,10 +257,10 @@ function PodiumSlot({ rank, name, grade, score, height, onClick }) {
       <p className="font-bold text-sm mt-2.5 text-center group-hover:text-primary transition-colors">
         {name}
       </p>
-      <Badge variant="outline" className="text-[10px] mt-0.5 rounded-xl border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]">{grade}</Badge>
+      <Badge variant="outline" className="text-[10px] mt-0.5 rounded-xl border border-border shadow-sm">{grade}</Badge>
       <div
         className={cn(
-          "w-32 mt-3 rounded-t-xl bg-gradient-to-t flex flex-col items-center justify-start pt-4 pb-3 shadow-[3px_3px_0_0_#171717]",
+          "w-32 mt-3 rounded-t-xl bg-gradient-to-t flex flex-col items-center justify-start pt-4 pb-3 shadow-sm",
           c.bg,
           height
         )}

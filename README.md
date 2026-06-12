@@ -43,6 +43,7 @@ VITE_MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxx
 
 | Route | Page | Description |
 |-------|------|-------------|
+| `/event` | EventDisplay | **Outside Layout** — big-screen event display for projectors |
 | `/` | Dashboard | CTF-style leaderboard (training mode), podium, timeline graph, session selector |
 | `/duel` | Competitif | Competition-mode leaderboard, live duel stats |
 | `/admin` | Admin | Read-only monitoring: stat cards, active rooms, tournaments, registrations |
@@ -55,7 +56,7 @@ VITE_MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxx
 | `/tournament/:id` | TournamentDetail | Bracket view, match management, admin result submission |
 | `/match/:room_id` | MatchDashboard | Live match spectator (outside Layout — full page) |
 
-All routes except `/match/:room_id` are wrapped in `<Layout />` (header + sidebar + health banner).
+All routes except `/match/:room_id` and `/event` are wrapped in `<Layout />` (top bar navigation).
 
 ## User Flow
 
@@ -104,21 +105,32 @@ Non-premium: vital signs, emotions, AI analysis blurred. Premium: full access.
 ### Score Formula
 
 ```
-score = (level_reached x 10) + (visuo_spatial_fit x 50) + (dexterity_score x 0.2)
+score = (level_reached × 1000) - (total_time × 10)
 ```
 
-| Component | Range | Points |
-|-----------|-------|--------|
-| `level_reached` (1-8) | 1-8 | 10-80 |
-| `visuo_spatial_fit` (0-1) | 0.0-1.0 | 0-50 |
-| `dexterity_score` (cognitive_age/real_age, capped 2.0) | 0.0-2.0 | 0-20 |
+| Component | Description |
+|-----------|-------------|
+| `level_reached` | Count of completed levels (task_time > 0), 1-8 |
+| `total_time` | Sum of all 8 task times in seconds |
+| Score range | ~0-8000 (capped min 0) |
 
-**Total range: 10-150**. One entry per participant per session (best score kept).
+Level is the primary factor; time breaks ties among the same level. One entry per participant per session (best score kept).
 
 ### Admin Mode
-- PIN-protected (hardcoded `7890`)
+- PIN-protected (configurable via `VITE_ADMIN_PIN` env var, default `7890`)
 - Destructive actions (delete participant, start cup, create room, register players) hidden until unlocked
 - `/admin` page is read-only monitoring regardless of admin mode
+
+### Dark/Light Theme
+- Toggle in the top navigation bar
+- CSS variables (`:root` + `.dark` class) for Merah Putih branding
+- All components use `bg-card`/`text-foreground`/`border-border` CSS vars
+
+### EventDisplay
+- `/event` — full-screen big-screen view for projectors, no Layout wrapper
+- Auto-refreshing tabs: Training leaderboard, Duel rooms + competition ranking, Tournament bracket live
+- Station health panel in header
+- WebSocket connection to `/ws/event-display` for live score/level updates
 
 ## API Endpoints Used
 
@@ -131,7 +143,10 @@ score = (level_reached x 10) + (visuo_spatial_fit x 50) + (dexterity_score x 0.2
 | GET | `/api/v1/participants/uid/:uid` | RFID UID lookup |
 | GET | `/api/v1/participants/uid/:uid/sessions` | Analytics — sessions |
 | GET | `/api/v1/participants/analysis/:uid` | AI Health Consultant |
+| GET | `/api/v1/participants/uid/:uid/results` | Analytics — per-level game result |
 | GET | `/api/v1/participants/lookup/:nickname` | Participant search |
+| GET | `/api/v1/stats` | Aggregate stats (KPI cards, per-level, gender, timeline) |
+| GET | `/api/v1/stations` | Station health panel |
 | DELETE | `/api/v1/participants/:id` | Delete participant (admin) |
 | POST | `/api/v1/payment/checkout/:uid` | Midtrans checkout |
 | POST | `/api/v1/payment/simulate-success/:uid` | Test payment |
@@ -145,9 +160,11 @@ score = (level_reached x 10) + (visuo_spatial_fit x 50) + (dexterity_score x 0.2
 | DELETE | `/api/v1/tournaments/:id` | Delete tournament |
 | POST | `/api/v1/tournaments/:id/start` | Start cup |
 | POST | `/api/v1/tournaments/:id/matches/:mid/result` | Submit match result |
-| GET | `/api/v1/export/excel` | Download Excel |
+| GET | `/api/v1/export/excel` | Download Excel (4 sheets incl. GameResults) |
 | GET | `/api/v1/export/pdf` | Download PDF leaderboard |
 | GET | `/api/v1/export/rapor/:uid` | Download rapor PDF |
+| GET | `/api/v1/export/csv` | Download full data CSV |
+| POST | `/api/v1/export/telegram` | Send Excel report to Telegram |
 
 ## Project Structure
 
@@ -200,7 +217,7 @@ npx playwright test  # E2E tests (auto-starts dev server; Chromium only)
 - **Tailwind CSS v4**: no `tailwind.config.js`; uses `@import "tailwindcss"` in `src/index.css`.
 - **Admin PIN**: hardcoded `7890` — destructive buttons only visible in admin mode.
 - **CORS**: backend is `AllowAllOrigins`, no proxy needed.
-- **Score fallback**: if `score` is null in session data, computed as `level_reached*10 + visuo_spatial_fit*50 + dexterity_score*0.2`.
+- **Score fallback**: if `score` is null in session data, computed as `level_reached × 1000 - total_time × 10`.
 - **E2E tests**: Playwright in `e2e/`. Backend must be running for full E2E flows; `test.skip()` when offline.
 
 ## Related Repositories

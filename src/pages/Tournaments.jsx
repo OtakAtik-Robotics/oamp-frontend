@@ -74,10 +74,10 @@ export function Tournaments() {
   }
 
   const statusColor = {
-    registration: "bg-blue-100 text-blue-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    ready: "bg-amber-100 text-amber-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    in_progress: "bg-green-100 text-green-700 border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
-    finished: "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717] shadow-[2px_2px_0_0_#171717]",
+    registration: "bg-blue-100 text-blue-700 border border-[var(--color-border)] shadow-sm",
+    ready: "bg-amber-100 text-amber-700 border border-[var(--color-border)] shadow-sm",
+    in_progress: "bg-green-100 text-green-700 border border-[var(--color-border)] shadow-sm",
+    finished: "bg-muted text-muted-foreground border border-[var(--color-border)] shadow-sm",
   };
 
   const statusLabel = {
@@ -91,7 +91,7 @@ export function Tournaments() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Turnamen Cup</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Turnamen Cup</h1>
           <p className="text-sm text-muted-foreground">Kelola single-elimination cup</p>
         </div>
         {adminMode && (
@@ -119,12 +119,12 @@ export function Tournaments() {
           {tournaments.map((t) => (
             <Card
               key={t.id}
-              className="cursor-pointer hover:shadow-[5px_5px_0_0_#171717] transition-all border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl"
+              className="cursor-pointer hover:shadow-sm transition-all border border-[var(--color-border)] shadow-sm rounded-xl"
               onClick={() => navigate(`/tournament/${t.id}`)}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg font-bold text-[#171717]">{t.name}</CardTitle>
+                  <CardTitle className="text-lg font-bold text-foreground">{t.name}</CardTitle>
                   <Badge className={statusColor[t.status] || ""}>
                     {statusLabel[t.status] || t.status}
                   </Badge>
@@ -175,7 +175,7 @@ export function Tournaments() {
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-md border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+        <DialogContent className="sm:max-w-md border border-[var(--color-border)] shadow-sm rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5" />
@@ -185,24 +185,24 @@ export function Tournaments() {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-bold text-[#171717]">Nama Cup</label>
+              <label className="text-sm font-bold text-foreground">Nama Cup</label>
               <Input
                 placeholder="Contoh: Cup Putaran 1"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
             </div>
             <div>
-              <label className="text-sm font-bold text-[#171717]">Max Peserta</label>
+              <label className="text-sm font-bold text-foreground">Max Peserta</label>
               <Input
                 type="number"
                 min={2}
                 max={64}
                 value={newMax}
                 onChange={(e) => setNewMax(e.target.value)}
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
               <p className="text-xs text-muted-foreground mt-1">Gunakan kelipatan 2 untuk bracket rapi (2, 4, 8, 16, 32)</p>
             </div>

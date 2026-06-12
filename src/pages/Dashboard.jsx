@@ -69,7 +69,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     const sortedPayload = [...uniquePayload].sort((a, b) => b.value - a.value);
 
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl shadow-lg z-50">
+      <div className="bg-card border border-[var(--color-border)] p-3 rounded-xl shadow-sm z-50">
         <p className="text-slate-500 dark:text-slate-400 text-xs font-mono mb-2 border-b border-slate-100 dark:border-slate-800 pb-2">
           {label}
         </p>
@@ -219,11 +219,11 @@ export function Dashboard() {
 
   const totalParticipants = leaderboard.length;
   const best = leaderboard[0]?.score;
-  const bestScore = best != null ? best.toFixed(0) : "N/A";
+  const bestScore = best != null ? Math.round(best) : null;
   const avg = leaderboard.length > 0
     ? leaderboard.reduce((a, b) => a + (b.score || 0), 0) / Math.max(leaderboard.length, 1)
     : 0;
-  const avgScore = leaderboard.length > 0 && !Number.isNaN(avg) ? avg.toFixed(0) : "N/A";
+  const avgScore = leaderboard.length > 0 && !Number.isNaN(avg) ? Math.round(avg) : null;
 
   const topPlayers = useMemo(
     () => leaderboard.slice(0, 8).map((p) => p.name),
@@ -334,7 +334,7 @@ export function Dashboard() {
       </div>
 
       {isReadOnly && (
-        <div className="bg-[#fef3c7] border-2 border-[#171717] text-[#171717] px-4 py-3 rounded-xl text-sm font-bold shadow-[4px_4px_0_0_#171717] flex items-center gap-2">
+        <div className="bg-[#fef3c7] border border-[var(--color-border)] text-foreground px-4 py-3 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2">
           <Eye className="h-4 w-4" />
           <span>
             Anda sedang melihat data sesi lama —{" "}
@@ -344,7 +344,7 @@ export function Dashboard() {
       )}
 
       {isError && (
-        <div className="bg-[#fee2e2] border-2 border-[#171717] text-[#171717] px-4 py-3 rounded-xl text-sm font-bold shadow-[4px_4px_0_0_#171717]">
+        <div className="bg-[#fee2e2] border border-[var(--color-border)] text-foreground px-4 py-3 rounded-xl text-sm font-bold shadow-sm">
           Gagal memuat leaderboard. Server offline.
         </div>
       )}
@@ -356,8 +356,8 @@ export function Dashboard() {
       </div>
 
       {processedTimeline.length > 0 && (
-        <div className="rounded-2xl overflow-hidden border-2 border-[#171717] bg-white shadow-[4px_4px_0_0_#171717]">
-          <div className="bg-[#f3f4f6] px-6 pt-5 pb-0">
+        <div className="rounded-2xl overflow-hidden border border-[var(--color-border)] bg-card shadow-sm">
+          <div className="bg-muted px-6 pt-5 pb-0">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -477,12 +477,12 @@ export function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-[#f9fafb] px-6 py-5 border-t-2 border-[#171717]">
+          <div className="bg-[#f9fafb] px-6 py-5 border-t-2 border-[var(--color-border)]">
             <div className="flex flex-wrap gap-x-6 gap-y-3">
               {legendOrder.map((player, index) => {
                 const colorIndex = topPlayers.indexOf(player);
                 const color = PLAYER_COLORS[colorIndex % PLAYER_COLORS.length];
-                const score = playerLatestScores[player] || 0;
+                const score = Math.round(playerLatestScores[player] || 0);
                 const rank = index + 1;
 
                 return (
@@ -517,8 +517,8 @@ export function Dashboard() {
       )}
 
       <Card className="overflow-hidden">
-        <CardHeader className="bg-[#f3f4f6] py-4 border-b-2 border-[#171717]">
-          <CardTitle className="flex items-center gap-2 text-[#171717]">
+        <CardHeader className="bg-muted py-4 border-b-2 border-[var(--color-border)]">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <Users className="h-5 w-5" />
             Global Rankings
           </CardTitle>
@@ -550,7 +550,7 @@ export function Dashboard() {
                 {allBatches.map((batch) => (
                   <div
                     key={batch.id}
-                    className="flex items-center justify-between gap-2 rounded-xl border-2 border-[#171717] bg-white px-3 py-2 shadow-[3px_3px_0_0_#171717]"
+                    className="flex items-center justify-between gap-2 rounded-xl border border-[var(--color-border)] bg-card px-3 py-2 shadow-sm"
                   >
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       {editingBatchId === batch.id ? (
@@ -580,7 +580,7 @@ export function Dashboard() {
                         </span>
                       )}
                       {batch.is_active && (
-                        <Badge className="bg-[#10b981] text-white text-[10px] px-1.5 py-0 shrink-0 border-[#171717]">
+                        <Badge className="bg-[#10b981] text-white text-[10px] px-1.5 py-0 shrink-0 border-[var(--color-border)]">
                           Active
                         </Badge>
                       )}
@@ -662,7 +662,7 @@ export function Dashboard() {
               value={newSessionPrefix}
               onChange={(e) => setNewSessionPrefix(e.target.value)}
               maxLength={10}
-              className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+              className="border border-[var(--color-border)] shadow-sm rounded-xl"
             />
             <p className="text-xs text-muted-foreground">
               ID peserta akan dibuat otomatis: {newSessionPrefix || "BDT"}001, {newSessionPrefix || "BDT"}002, dst.
@@ -700,9 +700,9 @@ export function Dashboard() {
 }
 
 const colorMap = {
-  blue: "bg-[#4f46e5] text-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
-  amber: "bg-[#fbbf24] text-[#171717] border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
-  green: "bg-[#10b981] text-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]",
+  blue: "bg-[#4f46e5] text-white border border-[var(--color-border)] shadow-sm",
+  amber: "bg-[#fbbf24] text-foreground border border-[var(--color-border)] shadow-sm",
+  green: "bg-[#10b981] text-white border border-[var(--color-border)] shadow-sm",
 };
 
 function StatCard({ title, value, icon, color }) {

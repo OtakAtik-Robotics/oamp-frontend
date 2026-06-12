@@ -27,8 +27,7 @@ const initialForm = {
   gender: "",
   height: "",
   weight: "",
-  heart_rate: "",
-  spo2: "",
+  dexterity: "",
   grip_strength: "",
 };
 
@@ -96,8 +95,7 @@ export function Register() {
       gender: form.gender,
       height: parseFloat(form.height),
       weight: parseFloat(form.weight),
-      heart_rate: form.heart_rate ? parseInt(form.heart_rate) : undefined,
-      spo2: form.spo2 ? parseFloat(form.spo2) : undefined,
+      dexterity: form.dexterity ? parseFloat(form.dexterity) : undefined,
       grip_strength: form.grip_strength ? parseFloat(form.grip_strength) : undefined,
     };
 
@@ -123,10 +121,10 @@ export function Register() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
-        <CardHeader className="bg-[#f3f4f6] border-b border-[#171717]">
-          <CardTitle className="flex items-center gap-2 text-[#171717] font-bold">
+    <div className="mx-auto">
+      <Card className="border border-[var(--color-border)] shadow-sm rounded-xl">
+        <CardHeader className="bg-muted border-b border-[var(--color-border)]">
+          <CardTitle className="flex items-center gap-2 text-foreground font-bold">
             <UserPlus className="h-5 w-5" />
             Registration Station
           </CardTitle>
@@ -145,7 +143,7 @@ export function Register() {
                 placeholder={hasUidPrefix ? `${autoUidHint} — kosongkan untuk auto` : "Masukkan ID peserta..."}
                 required={!hasUidPrefix}
                 autoFocus
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
               {hasUidPrefix ? (
                 <p className="text-xs text-muted-foreground">
@@ -167,7 +165,7 @@ export function Register() {
                 onChange={handleChange}
                 placeholder="Nama peserta"
                 required
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
             </div>
 
@@ -184,7 +182,7 @@ export function Register() {
                   onChange={handleChange}
                 placeholder="3-150"
                 required
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
               </div>
               <div className="space-y-2">
@@ -195,7 +193,7 @@ export function Register() {
                     setForm((prev) => ({ ...prev, grade: val }))
                   }
                 >
-                  <SelectTrigger className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl">
+                  <SelectTrigger className="border border-[var(--color-border)] shadow-sm rounded-xl">
                     <SelectValue placeholder="Pilih kelas" />
                   </SelectTrigger>
                   <SelectContent>
@@ -243,7 +241,7 @@ export function Register() {
                   onChange={handleChange}
                 placeholder="50-300"
                 required
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
               </div>
               <div className="space-y-2">
@@ -259,38 +257,25 @@ export function Register() {
                   onChange={handleChange}
                 placeholder="5-500"
                 required
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
               />
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="heart_rate">Heart Rate (bpm)</Label>
+                <Label htmlFor="dexterity">Dexterity</Label>
                 <Input
-                  id="heart_rate"
-                  name="heart_rate"
-                  type="number"
-                  min={40}
-                  max={220}
-                  value={form.heart_rate}
-                  onChange={handleChange}
-                  placeholder="Optional"
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="spo2">SpO2 (%)</Label>
-                <Input
-                  id="spo2"
-                  name="spo2"
+                  id="dexterity"
+                  name="dexterity"
                   type="number"
                   min={0}
-                  max={100}
-                  value={form.spo2}
+                  max={500}
+                  step={0.1}
+                  value={form.dexterity}
                   onChange={handleChange}
                   placeholder="Optional"
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -305,7 +290,7 @@ export function Register() {
                   value={form.grip_strength}
                   onChange={handleChange}
                   placeholder="Optional"
-                className="border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+                className="border border-[var(--color-border)] shadow-sm rounded-xl"
                 />
               </div>
             </div>

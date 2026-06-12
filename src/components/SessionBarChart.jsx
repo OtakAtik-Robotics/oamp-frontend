@@ -14,8 +14,8 @@ import {
 function SessionTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
   return (
-    <div className="bg-white border-2 border-[#171717] rounded-xl px-4 py-3 shadow-[4px_4px_0_0_#171717] text-sm space-y-1.5">
-      <p className="font-bold text-[#171717]">Session {label}</p>
+    <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-sm text-sm space-y-1.5">
+      <p className="font-bold text-foreground">Session {label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="flex items-center gap-2">
           <span
@@ -42,7 +42,7 @@ export function SessionBarChart({ sessions }) {
   }
 
   const chartData = sessions.map((s, i) => {
-    const score = s.score ?? (s.visuo_spatial_fit != null ? Math.round(s.visuo_spatial_fit * 100) : 0);
+    const score = s.score ?? Math.max(0, Math.round(s.level_reached * 1000 - (s.total_time || 0) * 10));
     return {
       session: `#${i + 1}`,
       score,

@@ -161,11 +161,11 @@ export function Participants() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Daftar Peserta</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Daftar Peserta</h1>
           <p className="text-sm text-muted-foreground">Peserta terdaftar dan hasil assessment</p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="secondary" className="text-sm px-3 py-1.5 gap-1.5 border-2 border-[#171717]">
+          <Badge variant="secondary" className="text-sm px-3 py-1.5 gap-1.5 border border-[var(--color-border)]">
             <Users className="h-3.5 w-3.5" />
             {participants.length} peserta
           </Badge>
@@ -187,7 +187,7 @@ export function Participants() {
           value={
             participants.length > 0
               ? Math.max(
-                  ...participants.filter((p) => p.score != null).map((p) => p.score)
+                  ...participants.filter((p) => p.score != null).map((p) => Math.round(p.score))
                 ) || "N/A"
               : "N/A"
           }
@@ -209,11 +209,11 @@ export function Participants() {
             placeholder="Cari nama, UID, atau kelas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl"
+            className="pl-9 bg-white border border-[var(--color-border)] shadow-sm rounded-xl"
           />
         </div>
         <Select value={selectedBatch} onValueChange={setSelectedBatch}>
-          <SelectTrigger className="w-[200px] bg-white border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] rounded-xl">
+          <SelectTrigger className="w-[200px] bg-white border border-[var(--color-border)] shadow-sm rounded-xl">
             <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
             <SelectValue placeholder="Semua Sesi" />
           </SelectTrigger>
@@ -229,9 +229,9 @@ export function Participants() {
         </Select>
       </div>
 
-      <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
-        <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
-          <CardTitle className="text-[#171717] text-base font-bold">Direktori Peserta</CardTitle>
+      <Card className="border border-[var(--color-border)] shadow-sm rounded-xl">
+        <CardHeader className="bg-muted border-b border-[var(--color-border)] py-4">
+          <CardTitle className="text-foreground text-base font-bold">Direktori Peserta</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
@@ -274,10 +274,10 @@ export function Participants() {
                   {filtered.map((p) => (
                     <TableRow
                       key={p.id}
-                      className="cursor-pointer group transition-all hover:bg-[#f3f4f6]"
+                      className="cursor-pointer group transition-all hover:bg-muted"
                       onClick={() => navigate(`/analytics/${p.uid}`)}
                     >
-                      <TableCell className="font-bold text-[#171717] group-hover:text-blue-600 transition-colors">
+                      <TableCell className="font-bold text-foreground group-hover:text-blue-600 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
                             {p.name?.charAt(0)?.toUpperCase()}
@@ -286,12 +286,12 @@ export function Participants() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <code className="text-xs bg-[#f3f4f6] px-1.5 py-0.5 rounded font-mono text-muted-foreground">
+                        <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-muted-foreground">
                           {p.uid}
                         </code>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-bold text-xs border-2 border-[#171717]">
+                        <Badge variant="outline" className="font-bold text-xs border border-[var(--color-border)]">
                           {p.grade}
                         </Badge>
                       </TableCell>
@@ -301,14 +301,14 @@ export function Participants() {
                       </TableCell>
                       <TableCell className="text-center">
                         {p.score != null ? (
-                          <span className="font-bold text-[#171717]">{p.score}</span>
+                          <span className="font-bold text-foreground">{Math.round(p.score)}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-center">
                         {p.level_reached != null ? (
-                          <span className="inline-flex items-center justify-center rounded-full w-7 h-7 bg-[#f3f4f6] text-sm font-bold text-[#171717]">
+                          <span className="inline-flex items-center justify-center rounded-full w-7 h-7 bg-muted text-sm font-bold text-foreground">
                             {p.level_reached}
                           </span>
                         ) : (
@@ -387,7 +387,7 @@ export function Participants() {
   function SortTh({ field, children, className }) {
     return (
       <TableHead
-        className={cn("cursor-pointer select-none hover:bg-[#f3f4f6] text-muted-foreground text-xs uppercase tracking-wider", className)}
+        className={cn("cursor-pointer select-none hover:bg-muted text-muted-foreground text-xs uppercase tracking-wider", className)}
         onClick={() => toggleSort(field)}
       >
         <span className="flex items-center gap-1">
@@ -412,8 +412,8 @@ const statColors = {
 
 function StatMini({ icon, label, value, color }) {
   return (
-    <div className={cn("flex items-center gap-3 rounded-xl border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] p-4", statColors[color])}>
-      <div className="p-2 rounded-lg bg-white shadow-[2px_2px_0_0_#171717]">{icon}</div>
+    <div className={cn("flex items-center gap-3 rounded-xl border border-[var(--color-border)] shadow-sm p-4", statColors[color])}>
+      <div className="p-2 rounded-lg bg-white shadow-sm">{icon}</div>
       <div>
         <p className="text-xs font-bold opacity-70 uppercase tracking-wide">{label}</p>
         <p className="text-lg font-bold">{value}</p>

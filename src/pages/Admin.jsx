@@ -35,7 +35,7 @@ export function Admin() {
   });
 
   const participants = participantsRes?.data || [];
-  const rooms = roomsRes?.data?.rooms || [];
+  const rooms = roomsRes?.data?.data || roomsRes?.data || [];
   const tournaments = tournamentsRes?.data || [];
 
   const totalPlayers = participants.length;
@@ -46,7 +46,7 @@ export function Admin() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#171717]">Event Control Center</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Event Control Center</h1>
         <p className="text-sm text-muted-foreground">Monitoring real-time — read only, tidak ada tombol hapus di sini.</p>
       </div>
 
@@ -60,9 +60,9 @@ export function Admin() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Active Rooms */}
-        <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
-          <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
-            <CardTitle className="text-[#171717] text-base font-bold flex items-center gap-2">
+        <Card className="border border-[var(--color-border)] shadow-sm rounded-xl">
+          <CardHeader className="bg-muted border-b border-[var(--color-border)] py-4">
+            <CardTitle className="text-foreground text-base font-bold flex items-center gap-2">
               <Radio className="h-4 w-4 text-rose-500" />
               Room Aktif ({activeRooms.length})
             </CardTitle>
@@ -77,15 +77,15 @@ export function Admin() {
             ) : (
               <div className="divide-y">
                 {activeRooms.map((room) => (
-                  <div key={room.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#f3f4f6] transition-colors">
+                  <div key={room.id} className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors">
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="font-mono text-xs border-2 border-[#171717]">
+                      <Badge variant="outline" className="font-mono text-xs border border-[var(--color-border)]">
                         {room.id}
                       </Badge>
                       <div className="text-sm">
-                        <span className="font-bold text-[#171717]">{room.player1_name}</span>
+                        <span className="font-bold text-foreground">{room.player1_name}</span>
                         <span className="text-muted-foreground mx-1.5">vs</span>
-                        <span className="font-bold text-[#171717]">{room.player2_name || "…"}</span>
+                        <span className="font-bold text-foreground">{room.player2_name || "…"}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -104,9 +104,9 @@ export function Admin() {
         </Card>
 
         {/* Tournaments */}
-        <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
-          <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
-            <CardTitle className="text-[#171717] text-base font-bold flex items-center gap-2">
+        <Card className="border border-[var(--color-border)] shadow-sm rounded-xl">
+          <CardHeader className="bg-muted border-b border-[var(--color-border)] py-4">
+            <CardTitle className="text-foreground text-base font-bold flex items-center gap-2">
               <Trophy className="h-4 w-4 text-amber-500" />
               Turnamen ({tournaments.length})
             </CardTitle>
@@ -124,10 +124,10 @@ export function Admin() {
                   <Link
                     key={t.id}
                     to={`/tournament/${t.id}`}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-[#f3f4f6] transition-colors group"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors group"
                   >
                     <div>
-                      <p className="text-sm font-bold text-[#171717] group-hover:text-blue-600 transition-colors">{t.name}</p>
+                      <p className="text-sm font-bold text-foreground group-hover:text-blue-600 transition-colors">{t.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {t.player_count}/{t.max_players} peserta — Ronde {t.current_round || 0}
                       </p>
@@ -145,9 +145,9 @@ export function Admin() {
       </div>
 
       {/* Recent registrations */}
-        <Card className="border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
-        <CardHeader className="bg-[#f3f4f6] border-b border-[#171717] py-4">
-          <CardTitle className="text-[#171717] text-base font-bold flex items-center gap-2">
+        <Card className="border border-[var(--color-border)] shadow-sm rounded-xl">
+        <CardHeader className="bg-muted border-b border-[var(--color-border)] py-4">
+          <CardTitle className="text-foreground text-base font-bold flex items-center gap-2">
             <Users className="h-4 w-4 text-blue-500" />
             Peserta Terbaru
           </CardTitle>
@@ -163,7 +163,7 @@ export function Admin() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#171717] text-muted-foreground text-xs uppercase tracking-wider">
+                  <tr className="border-b border-[var(--color-border)] text-muted-foreground text-xs uppercase tracking-wider">
                     <th className="px-4 py-2 text-left">Nama</th>
                     <th className="px-4 py-2 text-left">UID</th>
                     <th className="px-4 py-2 text-left">Kelas</th>
@@ -176,13 +176,13 @@ export function Admin() {
                     .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
                     .slice(0, 8)
                     .map((p) => (
-                      <tr key={p.id} className="hover:bg-[#f3f4f6] transition-colors">
-                        <td className="px-4 py-2.5 font-bold text-[#171717]">{p.name}</td>
+                      <tr key={p.id} className="hover:bg-muted transition-colors">
+                        <td className="px-4 py-2.5 font-bold text-foreground">{p.name}</td>
                         <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{p.uid}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">{p.grade}</td>
                         <td className="px-4 py-2.5 text-center">
                           {p.is_premium ? (
-                            <Badge className="bg-amber-100 text-amber-700 border-2 border-[#171717] text-[10px]">Premium</Badge>
+                            <Badge className="bg-amber-100 text-amber-700 border border-[var(--color-border)] text-[10px]">Premium</Badge>
                           ) : (
                             <span className="text-muted-foreground text-xs">—</span>
                           )}
@@ -212,8 +212,8 @@ function StatCard({ icon, label, value, color }) {
     emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
   };
   return (
-    <div className={cn("flex items-center gap-3 rounded-xl border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] p-4", colorMap[color])}>
-      <div className="p-2 rounded-lg bg-white shadow-[2px_2px_0_0_#171717]">{icon}</div>
+    <div className={cn("flex items-center gap-3 rounded-xl border border-[var(--color-border)] shadow-sm p-4", colorMap[color])}>
+      <div className="p-2 rounded-lg bg-white shadow-sm">{icon}</div>
       <div>
         <p className="text-xs font-bold opacity-70 uppercase tracking-wide">{label}</p>
         <p className="text-2xl font-bold">{value}</p>
@@ -224,20 +224,20 @@ function StatCard({ icon, label, value, color }) {
 
 function statusBg(status) {
   switch (status) {
-    case "waiting": return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
-    case "ready": return "bg-blue-100 text-blue-700 border-2 border-[#171717]";
-    case "playing": return "bg-amber-100 text-amber-700 border-2 border-[#171717]";
-    default: return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
+    case "waiting": return "bg-muted text-muted-foreground border border-[var(--color-border)]";
+    case "ready": return "bg-blue-100 text-blue-700 border border-[var(--color-border)]";
+    case "playing": return "bg-amber-100 text-amber-700 border border-[var(--color-border)]";
+    default: return "bg-muted text-muted-foreground border border-[var(--color-border)]";
   }
 }
 
 function tournamentStatusBg(status) {
   switch (status) {
-    case "registration": return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
-    case "ready": return "bg-blue-100 text-blue-700 border-2 border-[#171717]";
-    case "in_progress": return "bg-amber-100 text-amber-700 border-2 border-[#171717]";
-    case "finished": return "bg-green-100 text-green-700 border-2 border-[#171717]";
-    default: return "bg-[#f3f4f6] text-muted-foreground border-2 border-[#171717]";
+    case "registration": return "bg-muted text-muted-foreground border border-[var(--color-border)]";
+    case "ready": return "bg-blue-100 text-blue-700 border border-[var(--color-border)]";
+    case "in_progress": return "bg-amber-100 text-amber-700 border border-[var(--color-border)]";
+    case "finished": return "bg-green-100 text-green-700 border border-[var(--color-border)]";
+    default: return "bg-muted text-muted-foreground border border-[var(--color-border)]";
   }
 }
 

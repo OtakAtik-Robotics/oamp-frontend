@@ -35,6 +35,6 @@ export function AdminModeProvider({ children }) {
   );
 }
 
-export function useAdminMode() {
+export function useAdminMode() { // eslint-disable-line react-refresh/only-export-components
   return useContext(AdminModeContext);
 }

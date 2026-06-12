@@ -4,8 +4,7 @@ import {
   User,
   Ruler,
   Weight,
-  Heart,
-  Droplets,
+  Gauge,
   Hand,
   Calendar,
   GraduationCap,
@@ -15,7 +14,7 @@ export function ParticipantCard({ participant }) {
   if (!participant) return null;
 
   return (
-    <Card className="overflow-hidden border-2 border-[#171717] shadow-[4px_4px_0_0_#171717] rounded-xl">
+    <Card className="overflow-hidden border border-border shadow-sm rounded-xl">
       {/* Header */}
       <div className="relative bg-blue-600 px-6 py-6 text-white">
         <div className="flex items-start justify-between">
@@ -40,7 +39,7 @@ export function ParticipantCard({ participant }) {
               </div>
             </div>
           </div>
-          <Badge className="bg-blue-400 text-white border-2 border-[#171717] shadow-[2px_2px_0_0_#171717] font-mono hover:bg-blue-400">
+          <Badge className="bg-blue-400 text-white border border-border shadow-sm font-mono hover:bg-blue-400">
             {participant.uid}
           </Badge>
         </div>
@@ -48,7 +47,7 @@ export function ParticipantCard({ participant }) {
 
       <CardContent className="p-6">
         {/* Biometric info grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
           <BioItem
             icon={<Ruler className="h-4 w-4" />}
             label="Tinggi"
@@ -60,24 +59,13 @@ export function ParticipantCard({ participant }) {
             value={participant.weight != null ? `${participant.weight} kg` : "—"}
           />
           <BioItem
-            icon={<Heart className="h-4 w-4" />}
-            label="Detak Jantung"
+            icon={<Gauge className="h-4 w-4" />}
+            label="Dexterity"
             value={
-              participant.heart_rate
-                ? `${participant.heart_rate} bpm`
+              participant.dexterity != null
+                ? `${participant.dexterity}`
                 : "—"
             }
-            accent={participant.heart_rate ? "red" : null}
-          />
-          <BioItem
-            icon={<Droplets className="h-4 w-4" />}
-            label="SpO2"
-            value={
-              participant.spo2 != null
-                ? `${participant.spo2}%`
-                : "—"
-            }
-            accent={participant.spo2 != null ? "blue" : null}
           />
           <BioItem
             icon={<Hand className="h-4 w-4" />}
@@ -101,13 +89,13 @@ export function ParticipantCard({ participant }) {
 
 function BioItem({ icon, label, value, accent }) {
   const accentMap = {
-    red: "border-2 border-[#171717] bg-red-50",
-    blue: "border-2 border-[#171717] bg-blue-50",
+    red: "border border-border bg-red-50",
+    blue: "border border-border bg-blue-50",
   };
 
   return (
     <div
-      className={`flex flex-col items-center gap-1.5 rounded-xl border-2 border-[#171717] shadow-[2px_2px_0_0_#171717] p-3 ${
+      className={`flex flex-col items-center gap-1.5 rounded-xl border border-border shadow-sm p-3 ${
         accent ? accentMap[accent] : "bg-[#f3f4f6]"
       }`}
     >

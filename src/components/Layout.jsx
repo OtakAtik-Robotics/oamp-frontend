@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useHealthCheck } from "@/hooks/useHealthCheck";
 import { useAdminMode } from "@/contexts/AdminModeContext";
@@ -12,16 +12,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { UserPlus, Download, LayoutDashboard, Users, Swords, Trophy, Shield, ShieldCheck, ShieldOff } from "lucide-react";
+import { UserPlus, Download, LayoutDashboard, Users, Swords, Trophy, Shield, ShieldCheck, ShieldOff, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, emoji: "🏠" },
-  { to: "/participants", label: "Peserta", icon: Users, emoji: "👥" },
-  { to: "/tournaments", label: "Cup", icon: Trophy, emoji: "🏆" },
-  { to: "/register", label: "Daftar", icon: UserPlus, emoji: "✏️" },
-  { to: "/duel", label: "Duel", icon: Swords, emoji: "⚔️" },
-  { to: "/export", label: "Export", icon: Download, emoji: "📥" },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/participants", label: "Peserta", icon: Users },
+  { to: "/tournaments", label: "Cup", icon: Trophy },
+  { to: "/register", label: "Daftar", icon: UserPlus },
+  { to: "/duel", label: "Duel", icon: Swords },
+  { to: "/export", label: "Export", icon: Download },
 ];
 
 export function Layout() {
@@ -30,6 +30,18 @@ export function Layout() {
   const { adminMode, showPinDialog, setShowPinDialog, attemptActivate, deactivate } = useAdminMode();
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") return true;
+    if (stored === "light") return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   function handlePinSubmit(e) {
     e.preventDefault();
@@ -42,27 +54,27 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40">
-        <div className="bg-white border-b-2 border-[#171717]">
+        <div className="bg-card border-b-2 border-border">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center border-2 border-[#171717] shadow-[3px_3px_0_0_#171717] transition-all group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-[2px_2px_0_0_#171717]">
-                  <span className="text-xl">🧩</span>
+                <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center border border-border shadow-sm transition-all group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-sm">
+                  <span className="text-xl text-primary-foreground font-black">🧩</span>
                 </div>
-                <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-[#10b981] rounded-full border-2 border-[#171717]" />
+                <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-500 rounded-full border border-border" />
               </div>
               <div>
-                <span className="font-bold text-xl tracking-tight text-foreground" style={{ fontFamily: '"Fredoka", sans-serif' }}>
-                  OAMP
+                <span className="font-bold text-lg tracking-tight text-foreground" style={{ fontFamily: '"Fredoka", sans-serif' }}>
+                  Otak Atik Merah Putih
                 </span>
-                <span className="text-muted-foreground text-sm font-bold ml-1.5">
+                <span className="text-muted-foreground text-xs font-medium ml-1.5">
                   Block Design Test
                 </span>
               </div>
             </Link>
 
             <div className="flex items-center gap-2">
-              <nav className="flex items-center gap-1 bg-muted p-1.5 rounded-2xl border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]">
+              <nav className="flex items-center gap-1 bg-muted p-1.5 rounded-2xl border border-border shadow-sm">
                 {navItems.map((item) => {
                   const isActive =
                     item.to === "/"
@@ -76,8 +88,8 @@ export function Layout() {
                       className={cn(
                         "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold transition-all",
                         isActive
-                          ? "bg-white text-foreground border-2 border-[#171717] shadow-[3px_3px_0_0_#171717]"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white hover:border-2 hover:border-[#171717] hover:shadow-[3px_3px_0_0_#171717]"
+                          ? "bg-primary text-primary-foreground border border-border shadow-sm"
+                          : "text-muted-foreground hover:text-foreground hover:bg-white hover:border hover:border-border hover:shadow-sm dark:hover:bg-card"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
@@ -86,6 +98,14 @@ export function Layout() {
                   );
                 })}
               </nav>
+
+              {/* Dark/Light toggle */}
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-sm font-bold bg-muted border border-border shadow-sm text-muted-foreground hover:text-foreground transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-sm"
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
 
               {/* Admin mode toggle */}
               {adminMode ? (

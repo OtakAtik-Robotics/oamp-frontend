@@ -51,99 +51,75 @@
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Neo-Brutalist Colorful — Light Mode */
-  --background: #fffbeb;
-  --foreground: #171717;
-
+  /* Merah Putih — Light */
+  --background: #f8f9fa;
+  --foreground: #1f2937;
   --card: #ffffff;
-  --card-foreground: #171717;
-
+  --card-foreground: #1f2937;
   --popover: #ffffff;
-  --popover-foreground: #171717;
-
-  /* Bold Indigo Primary */
-  --primary: #4f46e5;
+  --popover-foreground: #1f2937;
+  --primary: #dc2626;
   --primary-foreground: #ffffff;
-
-  /* Bold Amber Secondary */
-  --secondary: #fbbf24;
-  --secondary-foreground: #171717;
-
-  --muted: #e5e7eb;
-  --muted-foreground: #525252;
-
-  /* Playful Pink Accent */
-  --accent: #ec4899;
+  --secondary: #fef2f2;
+  --secondary-foreground: #dc2626;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #1e293b;
   --accent-foreground: #ffffff;
-
-  --destructive: #ef4444;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-
-  /* Thick dark borders — Brutalism signature */
-  --border: #171717;
-  --input: #171717;
-  --ring: #4f46e5;
-
-  /* Chart colors — bright & distinct for kids */
-  --chart-1: #4f46e5;
-  --chart-2: #fbbf24;
-  --chart-3: #ec4899;
-  --chart-4: #10b981;
-  --chart-5: #f97316;
-
-  --sidebar: #fffbeb;
-  --sidebar-foreground: #171717;
-  --sidebar-primary: #4f46e5;
+  --border: #fca5a5;
+  --input: #dc2626;
+  --ring: #dc2626;
+  --chart-1: #dc2626;
+  --chart-2: #f97316;
+  --chart-3: #eab308;
+  --chart-4: #22c55e;
+  --chart-5: #3b82f6;
+  --sidebar: #fef2f2;
+  --sidebar-foreground: #1f2937;
+  --sidebar-primary: #dc2626;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fbbf24;
-  --sidebar-accent-foreground: #171717;
-  --sidebar-border: #171717;
-  --sidebar-ring: #4f46e5;
+  --sidebar-accent: #fca5a5;
+  --sidebar-accent-foreground: #dc2626;
+  --sidebar-border: #fca5a5;
+  --sidebar-ring: #dc2626;
 }
 
 .dark {
-  --background: #171717;
-  --foreground: #fafafa;
-
-  --card: #262626;
-  --card-foreground: #fafafa;
-
-  --popover: #262626;
-  --popover-foreground: #fafafa;
-
-  --primary: #818cf8;
-  --primary-foreground: #171717;
-
-  --secondary: #fbbf24;
-  --secondary-foreground: #171717;
-
-  --muted: #404040;
-  --muted-foreground: #a3a3a3;
-
-  --accent: #f472b6;
-  --accent-foreground: #171717;
-
+  /* Merah Gelap — Dark */
+  --background: #111827;
+  --foreground: #f9fafb;
+  --card: #1f2937;
+  --card-foreground: #f9fafb;
+  --popover: #1f2937;
+  --popover-foreground: #f9fafb;
+  --primary: #ef4444;
+  --primary-foreground: #ffffff;
+  --secondary: #1f0f0f;
+  --secondary-foreground: #fca5a5;
+  --muted: #374151;
+  --muted-foreground: #cbd5e1;
+  --accent: #fbbf24;
+  --accent-foreground: #1a1a1a;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-
-  --border: #525252;
-  --input: #525252;
-  --ring: #818cf8;
-
-  --chart-1: #818cf8;
-  --chart-2: #fbbf24;
-  --chart-3: #f472b6;
-  --chart-4: #34d399;
-  --chart-5: #fb923c;
-
-  --sidebar: #171717;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #818cf8;
-  --sidebar-primary-foreground: #171717;
+  --border: #7f1d1d;
+  --input: #7f1d1d;
+  --ring: #ef4444;
+  --chart-1: #ef4444;
+  --chart-2: #fb923c;
+  --chart-3: #facc15;
+  --chart-4: #4ade80;
+  --chart-5: #60a5fa;
+  --sidebar: #111827;
+  --sidebar-foreground: #f9fafb;
+  --sidebar-primary: #ef4444;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #fbbf24;
-  --sidebar-accent-foreground: #171717;
-  --sidebar-border: #525252;
-  --sidebar-ring: #818cf8;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #7f1d1d;
+  --sidebar-ring: #ef4444;
 }
 
 @layer base {
@@ -155,6 +131,7 @@
     font-family: var(--font-sans);
     font-size: 16px;
     line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: "Fredoka", var(--font-sans);
@@ -163,90 +140,32 @@
   }
 }
 
-/* ===== NEO-BRUTALIST UTILITIES ===== */
+/* ===== REFERENCE-STYLE UTILITIES ===== */
 
-@utility brutal-shadow {
-  box-shadow: 4px 4px 0 0 #171717;
+@utility card-elevated {
+  @apply rounded-2xl bg-card;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-@utility brutal-shadow-sm {
-  box-shadow: 2px 2px 0 0 #171717;
-}
-
-@utility brutal-shadow-lg {
-  box-shadow: 6px 6px 0 0 #171717;
-}
-
-@utility brutal-shadow-hover {
-  box-shadow: 6px 6px 0 0 #171717;
-}
-
-@utility brutal-card {
-  @apply rounded-xl border-2 border-[#171717] bg-card brutal-shadow transition-all;
-}
-
-@utility brutal-card-hover {
-  @apply hover:translate-x-[2px] hover:translate-y-[2px] hover:brutal-shadow-hover;
-}
-
-@utility brutal-btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#171717] px-4 py-2 text-sm font-bold transition-all;
-  box-shadow: 4px 4px 0 0 #171717;
-}
-
-@utility brutal-btn-hover {
-  @apply hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px];
-  &:hover { box-shadow: 2px 2px 0 0 #171717; }
-  &:active { box-shadow: 0 0 0 0 #171717; }
-}
-
-@utility brutal-input {
-  @apply rounded-xl border-2 border-[#171717] bg-white px-4 py-2 text-base font-medium shadow-none outline-none;
-  &:focus {
-    @apply ring-0;
-    box-shadow: 4px 4px 0 0 #171717;
-  }
-}
-
-@utility brutal-badge {
-  @apply inline-flex items-center gap-1 rounded-lg border-2 border-[#171717] px-2.5 py-1 text-xs font-bold;
-  box-shadow: 2px 2px 0 0 #171717;
-}
-
-@utility brutal-nav-item {
-  @apply flex items-center gap-2 rounded-xl border-2 border-transparent px-3.5 py-2.5 text-sm font-bold transition-all;
+@utility card-hover {
   &:hover {
-    @apply border-[#171717] bg-white;
-    box-shadow: 4px 4px 0 0 #171717;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.1), 0 4px 6px -2px rgba(220, 38, 38, 0.05);
   }
 }
 
-@utility brutal-nav-active {
-  @apply border-[#171717] bg-white;
-  box-shadow: 4px 4px 0 0 #171717;
+@utility nav-btn {
+  @apply flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer;
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
 }
 
-/* ===== LEGACY ANIMATIONS (keep for compatibility) ===== */
-
-@utility arcade-glow {
-  box-shadow: 0 0 20px rgba(255, 107, 107, 0.3), 0 0 60px rgba(255, 107, 107, 0.1);
+@utility nav-btn-active {
+  @apply bg-primary text-primary-foreground;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
 }
 
-@utility arcade-glow-teal {
-  box-shadow: 0 0 20px rgba(78, 205, 196, 0.3), 0 0 60px rgba(78, 205, 196, 0.1);
-}
-
-@utility arcade-glow-gold {
-  box-shadow: 0 0 20px rgba(254, 202, 87, 0.4), 0 0 60px rgba(254, 202, 87, 0.15);
-}
-
-@utility card-playful {
-  @apply rounded-2xl border-2 bg-card shadow-lg transition-all duration-200;
-}
-
-@utility card-playful-hover {
-  @apply hover:shadow-xl hover:scale-[1.01] hover:border-primary/30;
-}
+/* ===== ANIMATIONS ===== */
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
@@ -254,8 +173,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(255,107,107,0.4); }
-  50% { box-shadow: 0 0 24px rgba(255,107,107,0.8); }
+  0%, 100% { box-shadow: 0 0 8px rgba(220, 38, 38, 0.4); }
+  50% { box-shadow: 0 0 24px rgba(220, 38, 38, 0.8); }
 }
 
 @keyframes slide-up {
