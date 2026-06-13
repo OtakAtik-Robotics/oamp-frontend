@@ -12,7 +12,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Swords, Trophy, LayoutGrid, Table2, BarChart3 } from "lucide-react";
+import { Loader2, Swords, Trophy, LayoutGrid, Table2, BarChart3, History } from "lucide-react";
 import { StatsPanel } from "@/components/StatsPanel";
 import { DuelRoom } from "@/components/DuelRoom";
 
@@ -23,6 +23,7 @@ function getScore(row) {
 
 const TABS = [
   { key: "live", icon: LayoutGrid, label: "Live Duel" },
+  { key: "history", icon: History, label: "Riwayat" },
   { key: "ranking", icon: Table2, label: "Peringkat" },
   { key: "stats", icon: BarChart3, label: "Statistik" },
 ];
@@ -113,10 +114,25 @@ export function Competitif() {
     refetchInterval: 3000,
   });
 
+  // History (finished) rooms — fetched once, no need to poll as aggressively
+  const { data: historyRes } = useQuery({
+    queryKey: ["rooms-history"],
+    queryFn: () => api.get("/rooms"),
+    refetchInterval: 10000,
+  });
+
   const rooms = useMemo(() => {
     const raw = roomsRes?.data?.data || roomsRes?.data || [];
     return raw.filter((r) => ["waiting", "ready", "playing"].includes(r.status));
   }, [roomsRes]);
+
+  const historyRooms = useMemo(() => {
+    const raw = historyRes?.data?.data || historyRes?.data || [];
+    return raw
+      .filter((r) => r.status === "finished")
+      .sort((a, b) => (b.last_activity || "").localeCompare(a.last_activity || ""))
+      .slice(0, 30);
+  }, [historyRes]);
 
   const data = useMemo(() => boardRes?.data?.data || boardRes?.data || [], [boardRes]);
 
@@ -256,11 +272,72 @@ export function Competitif() {
                         </Card>
                       </div>
                     )}
-                  </div>
-                )
-              )}
+                   </div>
+                 )
+               )}
 
-              {/* RANKING TAB */}
+               {/* HISTORY TAB — finished rooms */}
+               {tab === "history" && (
+                 <div className="max-w-3xl mx-auto">
+                   <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
+                     <History className="h-5 w-5 text-muted-foreground" />
+                     Riwayat Duel
+                   </h2>
+                   {historyRooms.length === 0 ? (
+                     <div className="flex flex-col items-center justify-center py-32 text-muted-foreground border border-dashed border-border rounded-2xl">
+                       <History className="h-12 w-12 mb-4 opacity-30" />
+                       <p className="text-xl font-bold text-foreground">Belum ada riwayat duel</p>
+                       <p className="text-sm mt-2 text-muted-foreground">Room yang sudah selesai akan muncul di sini</p>
+                     </div>
+                   ) : (
+                     <Card className="rounded-2xl overflow-hidden border border-border bg-card shadow-sm">
+                       <CardContent className="p-0">
+                         <Table>
+                           <TableHeader>
+                             <TableRow className="hover:bg-transparent border-b border-border">
+                               <TableHead className="text-muted-foreground uppercase text-xs font-bold py-3 px-5">Room</TableHead>
+                               <TableHead className="text-muted-foreground uppercase text-xs font-bold py-3 px-5">Pemenang</TableHead>
+                               <TableHead className="text-muted-foreground uppercase text-xs font-bold py-3 px-5 text-center">P1</TableHead>
+                               <TableHead className="text-muted-foreground uppercase text-xs font-bold py-3 px-5 text-center">P2</TableHead>
+                               <TableHead className="text-muted-foreground uppercase text-xs font-bold py-3 px-5">Selesai</TableHead>
+                             </TableRow>
+                           </TableHeader>
+                           <TableBody>
+                             {historyRooms.map((r) => {
+                               const winnerName = r.winner === "1" ? r.player1_name
+                                 : r.winner === "2" ? r.player2_name
+                                 : "Seri";
+                               const winnerColor = r.winner === "draw" ? "text-muted-foreground"
+                                 : "text-emerald-600 dark:text-emerald-400";
+                               return (
+                                 <TableRow key={r.id} className="border-b border-border/50">
+                                   <TableCell className="py-3 px-5">
+                                     <Badge variant="outline" className="font-mono font-bold">{r.id}</Badge>
+                                   </TableCell>
+                                   <TableCell className={cn("py-3 px-5 font-bold", winnerColor)}>
+                                     🏆 {winnerName}
+                                   </TableCell>
+                                   <TableCell className="py-3 px-5 text-center font-mono text-sm">
+                                     {r.player1_score ? `${r.player1_score.toFixed(1)}s` : "—"}
+                                   </TableCell>
+                                   <TableCell className="py-3 px-5 text-center font-mono text-sm">
+                                     {r.player2_score ? `${r.player2_score.toFixed(1)}s` : "—"}
+                                   </TableCell>
+                                   <TableCell className="py-3 px-5 text-xs text-muted-foreground">
+                                     {r.last_activity ? new Date(r.last_activity).toLocaleString("id-ID") : "—"}
+                                   </TableCell>
+                                 </TableRow>
+                               );
+                             })}
+                           </TableBody>
+                         </Table>
+                       </CardContent>
+                     </Card>
+                   )}
+                 </div>
+               )}
+
+               {/* RANKING TAB */}
               {tab === "ranking" && (
                 <div className="max-w-3xl mx-auto">
                   <div className="flex items-center justify-between mb-6">

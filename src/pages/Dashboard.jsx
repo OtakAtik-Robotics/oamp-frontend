@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useAdminMode } from "@/contexts/AdminModeContext";
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,7 @@ export function Dashboard() {
   const [editingBatchId, setEditingBatchId] = useState(null);
   const [editBatchName, setEditBatchName] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [leaderboardMode, setLeaderboardMode] = useState("training");
 
   const { data: batchesRes } = useQuery({
     queryKey: ["batches"],
@@ -142,17 +144,17 @@ export function Dashboard() {
 
   const batchParams =
     selectedBatchId !== "all"
-      ? { params: { batch_id: selectedBatchId, mode: "training" } }
-      : { params: { batch_id: "all", mode: "training" } };
+      ? { params: { batch_id: selectedBatchId, mode: leaderboardMode } }
+      : { params: { batch_id: "all", mode: leaderboardMode } };
 
   const { data: boardRes, isLoading, isError, refetch: refetchBoard } = useQuery({
-    queryKey: ["leaderboard", "training", selectedBatchId],
+    queryKey: ["leaderboard", leaderboardMode, selectedBatchId],
     queryFn: () => api.get("/leaderboard", batchParams),
     refetchInterval: isReadOnly ? false : 5000,
   });
 
   const { data: timeRes, refetch: refetchTimeline } = useQuery({
-    queryKey: ["timeline", "training", selectedBatchId],
+    queryKey: ["timeline", leaderboardMode, selectedBatchId],
     queryFn: () => api.get("/leaderboard/timeline", batchParams),
     refetchInterval: isReadOnly ? false : 5000,
   });
@@ -285,6 +287,31 @@ export function Dashboard() {
           )}
         </div>
         <div className="flex flex-wrap gap-2">
+          {/* Mode toggle: Latihan / Kompetisi */}
+          <div className="flex items-center bg-muted border border-border rounded-xl p-1">
+            <button
+              onClick={() => setLeaderboardMode("training")}
+              className={cn(
+                "px-3 py-1 rounded-lg text-xs font-bold transition-all",
+                leaderboardMode === "training"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Latihan
+            </button>
+            <button
+              onClick={() => setLeaderboardMode("competition")}
+              className={cn(
+                "px-3 py-1 rounded-lg text-xs font-bold transition-all",
+                leaderboardMode === "competition"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Kompetisi
+            </button>
+          </div>
           <Select value={selectedBatchId} onValueChange={setSelectedBatchId}>
             <SelectTrigger className="w-[200px] h-9">
               <SelectValue placeholder="Pilih sesi..." />

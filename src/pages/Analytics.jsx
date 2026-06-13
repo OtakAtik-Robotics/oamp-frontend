@@ -593,10 +593,12 @@ export function Analytics() {
                           {s.cognitive_age ?? "—"}
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm">
-                          {new Date(s.created_at).toLocaleDateString("id-ID", {
+                          {new Date(s.created_at).toLocaleString("id-ID", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </TableCell>
                       </TableRow>
